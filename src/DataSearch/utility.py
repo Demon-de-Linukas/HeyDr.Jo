@@ -52,9 +52,4 @@ def get_start_info(number, root):
     return titlestr, namestr, time
 
 
-tree = etree.parse('C:/Users\linuk\Desktop\Staedel_Teilset/Objekte.xml')
-root = tree.getroot()
-title, name, time = get_start_info('13', root)
-print('\nTitle is: ' +title +'\n')
-print('Artist is: ' +name +'\n')
-print('Created time is: ' +time +'\n')
+
