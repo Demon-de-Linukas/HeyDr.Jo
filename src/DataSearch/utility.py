@@ -1,4 +1,6 @@
 from lxml import etree
+import requests
+
 
 
 def get_start_info(number, root):
@@ -52,4 +54,31 @@ def get_start_info(number, root):
     return titlestr, namestr, time
 
 
+def name_API(str):
+    """
+    Covert name string to an acceptable format for API
+    :param str:
+    :return:
+    """
+    nPos = str.index(',')
+    nachname = str[0:nPos]
+    afterCa = str[(nPos+2):]
+    after = afterCa.replace(' ', '_')
+    all=after+'_'+nachname
+    return all
 
+
+def search_artist(namestr):
+    """
+    Get the description of artist from DBpedia
+    :param namestr: name string from xml data set
+    :return: Description
+    """
+    APIname=name_API(namestr)
+    jadd = 'http://dbpedia.org/data/' + APIname + '.json'
+    add = 'http://dbpedia.org/resource/' + APIname
+    data = requests.get(jadd).json()
+    artist = data[add]
+    #TODO: Language change?
+    description = artist['http://dbpedia.org/ontology/abstract'][2]['value']
+    return description
