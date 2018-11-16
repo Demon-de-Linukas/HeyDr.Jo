@@ -5,9 +5,9 @@ import xml.etree.ElementTree as et
 from lxml import etree
 from src.DataSearch import utility as ut
 
-
-
-tree = etree.parse('C:/Users\linuk\Desktop\Staedel_Teilset/Objekte.xml')
+#Give the path of the dataset
+pathOfDataset = 'C:/Users\linuk\Desktop\Staedel_Teilset/Objekte.xml'
+tree = etree.parse(pathOfDataset)
 root = tree.getroot()
 title, name, time = ut.get_start_info('464', root)
 print('\nTitle is: ' +title +'\n')
