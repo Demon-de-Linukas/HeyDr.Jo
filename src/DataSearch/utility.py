@@ -1,5 +1,6 @@
 from lxml import etree
 import requests
+import time
 
 
 
@@ -29,14 +30,14 @@ def get_start_info(number, root):
         if refnumber.text == number:
             record = refnumber.getparent()
             break
-    #Title######
+    ###Title######
     title = record.find('.//title')
     titlestr = title.text
-
+    ###artist#####
     creator = record.find('.//Creator')
     name = creator.find('.//name')
     namestr = name.text
-
+    ###Time######
     product = record.find('.//Production_date')
     pre =''
     end = ''
@@ -49,8 +50,13 @@ def get_start_info(number, root):
         return titlestr, namestr, time
     except AttributeError:
         end = 'oop'
-
     time = anfang
+    ###atmosphere###
+    # atmosphereList = record.findall('.//atmosphere')
+    # for ato in atmosphereList:
+    #     aaa = ato.attrib['lang']
+    #     print(aaa)
+
     return titlestr, namestr, time
 
 
@@ -80,5 +86,9 @@ def search_artist(namestr):
     data = requests.get(jadd).json()
     artist = data[add]
     #TODO: Language change?
-    description = artist['http://dbpedia.org/ontology/abstract'][2]['value']
-    return description
+    descriptionList = artist['http://dbpedia.org/ontology/abstract']
+    for description in descriptionList:
+        if description['lang'] == 'en':
+            return description['value']
+    return 'None english description!'
+
