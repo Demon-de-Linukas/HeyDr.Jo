@@ -1,10 +1,11 @@
 import requests
 
 name='Peter_Paul_Rubens'
-add = 'http://dbpedia.org/resource/'+name
-jadd = 'http://dbpedia.org/data/'+name+'.json'
-data = requests.get(jadd).json()
-matteo = data[add]
+add = 'https://de.wikipedia.org/w/api.php?action=query&titles=Christian_Georg_Schütz_der_Ältere&prop=extracts&exintro&format=json&formatversion=2'
+# add = 'https://de.wikipedia.org/wiki/Christian_Georg_Schütz_der_Ältere'
+# jadd = 'http://dbpedia.org/data/'+name+'.json'
+data = requests.get(add).json
+what = data.query.pages[0].extract
 
 # matteo is a dictionary with lots of keys
 # that correspond to the player's properties.

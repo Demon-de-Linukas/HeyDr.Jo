@@ -56,7 +56,7 @@ def get_start_info(number, root):
     time = anfang
 
 
-    return titlestr, namestr, time
+    return titlestr, namestr, time, record
 
 
 def name_API(str):
@@ -82,9 +82,9 @@ def name_API(str):
         return all
 
 
-def search_artist_wiki(namestr):
+def search_wiki(namestr):
     """
-    Get the description of artist from DBpedia
+    Get the description from DBpedia
     Parameters
     ----------
     namestr ::
@@ -112,13 +112,28 @@ def search_artist_wiki(namestr):
     except (KeyError,JSONDecodeError):
         print('None english description!')
     try:
-        final += 'German description: '
+        add = 'https://en.wikipedia.org/w/api.php?action=query&titles= %s &prop=extracts&exintro&format=json&formatversion=2' % (
+            APIname)
+        datas = requests.get(add).json()
+        querry = datas['query']
+        page = querry['pages'][0]
+        text = page['extract']
+        if text != '':
+            final += 'Englisch description: '
+            final += re.sub(r'<.*?>', '', text)
+            return final
+    except KeyError:
+        print('None english description!')
+    try:
         add = 'https://de.wikipedia.org/w/api.php?action=query&titles= %s &prop=extracts&exintro&format=json&formatversion=2' % (
             APIname)
         datas = requests.get(add).json()
         querry = datas['query']
         page = querry['pages'][0]
         text = page['extract']
+        if text == '':
+            return 'No description'
+        final += 'German description: '
         final += re.sub(r'<.*?>', '', text)
         return final
     except KeyError:
@@ -144,23 +159,25 @@ def search_artist_xml(name,root):
         """
     artistList = root.getiterator('Artist')
     for artist in artistList:
-        if artist.attrib['name'] == name:
+        if artist.attrib['name'] == name :
             desc = artist.find('.//descriprion')
             return desc.text
-    return search_artist_wiki(name)
+    return search_wiki(name)
 
-def create_xml(list, fpath):
+def create_artist_datenSet(listSum, fpath):
     doc = Document()  # create DOM object
+    records = doc.createElement('records')
     AllPerson = doc.createElement('AllPerson')  # create root element
-    doc.appendChild(AllPerson)
-    lenth = len(list[0])
+    doc.appendChild(records)
+    records.appendChild(AllPerson)
+    lenth = len(listSum[0])
     for i in range(lenth):
         artist = doc.createElement('Artist')
-        artist.setAttribute('name', list[0][i])
+        artist.setAttribute('name', listSum[0][i])
         AllPerson.appendChild(artist)
         descrip = doc.createElement('descriprion')
         artist.appendChild(descrip)
-        text = doc.createTextNode((list[1][i]).encode('utf-8').decode('utf-8'))
+        text = doc.createTextNode((listSum[1][i]).encode('utf-8').decode('utf-8'))
         descrip.appendChild(text)
     f = open(fpath, 'w', encoding='utf-8')
     doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='utf-8')
@@ -181,7 +198,7 @@ def getAllArtist(root):
         namestr = name.text
         if namestr in listName: continue
         listName.append(namestr)
-        description = search_artist_wiki(namestr)
+        description = search_wiki(namestr)
         listDescrip.append(description)
         print('%d\n'%(i))
         print('Time: %.3f '%(time.time()-pre))
@@ -190,3 +207,58 @@ def getAllArtist(root):
     sumList.append(listName)
     sumList.append(listDescrip)
     return sumList
+
+
+def get_style(record):
+    try:
+        style = record.find('school_style')
+        termList = style.getiterator('term')
+        for term in termList:
+            if term.get('lang')=='en-GB':
+                return term.text
+    except AttributeError:
+        return 'Nothing'
+
+
+def getAllStyle(root):
+    listStyle = []
+    listDescrip = []
+    sumList = []
+    recordList = root.getiterator('record')
+    i=0
+    pretime = time.time()
+    for record in recordList:
+        pre = time.time()
+        style = get_style(record)
+        if (style in listStyle) or style == 'Nothing': continue
+        listStyle.append(style)
+        description = search_wiki(style)
+        listDescrip.append(description)
+        print('%d\n'%(i))
+        print('Time: %.3f '%(time.time()-pre))
+        i +=1
+    print('\nDuration of the test: %.3f seconds' % (time.time() - pretime))
+    sumList.append(listStyle)
+    sumList.append(listDescrip)
+    return sumList
+
+
+def create_style_tree(listSum,fpath,outpath):
+    tree = etree.parse(fpath)
+    root = tree.getroot()
+    all_style = etree.Element('Allstyle')  # create root element
+    lenth = len(listSum[0])
+    for i in range(lenth):
+        styles = etree.Element('style')
+        styles.set('stylename', listSum[0][i])
+        all_style.append(styles)
+        descrip = etree.Element('descriprion')
+        styles.append(descrip)
+        # text = etree.Element((listSum[1][i]))
+        descrip.text = listSum[1][i]
+    root.append(all_style)
+    tree.write(outpath, encoding="utf-8",xml_declaration=True)
+    # f = open(fpath, 'w', encoding='utf-8')
+    #
+    # doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='utf-8')
+    # f.close()
