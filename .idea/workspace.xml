@@ -11,7 +11,7 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/HeyDr_Jo$reg.coverage" NAME="reg Coverage Results" MODIFIED="1542380915378" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
-    <SUITE FILE_PATH="coverage/HeyDr_Jo$test.coverage" NAME="test Coverage Results" MODIFIED="1543241093797" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/HeyDr_Jo$test.coverage" NAME="test Coverage Results" MODIFIED="1543361584335" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/HeyDr_Jo$try__1_.coverage" NAME="try (1) Coverage Results" MODIFIED="1542376915992" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/DataSearch" />
     <SUITE FILE_PATH="coverage/HeyDr_Jo$utility.coverage" NAME="utility Coverage Results" MODIFIED="1542376454449" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/DataSearch" />
     <SUITE FILE_PATH="coverage/codingDavinci$try.coverage" NAME="try Coverage Results" MODIFIED="1542362911544" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
@@ -23,11 +23,29 @@
       <file leaf-file-name="test.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="12" column="19" selection-start-line="12" selection-start-column="19" selection-end-line="12" selection-end-column="19" />
+            <state relative-caret-position="389">
+              <caret line="24" column="48" lean-forward="true" selection-start-line="24" selection-start-column="48" selection-end-line="24" selection-end-column="48" />
               <folding>
                 <element signature="e#25#59#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="_pydev_execfile.py" pinned="false" current-in-tab="false">
+        <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="289">
+              <caret line="17" selection-start-line="17" selection-end-line="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="codecs.py" pinned="false" current-in-tab="false">
+        <entry file="file://D:/Apps/Anacoda/Lib/codecs.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="169">
+              <caret line="310" selection-start-line="310" selection-end-line="310" />
             </state>
           </provider>
         </entry>
@@ -44,17 +62,23 @@
       <file leaf-file-name="utility.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/DataSearch/utility.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-34">
-              <caret line="167" column="33" selection-start-line="167" selection-start-column="33" selection-end-line="167" selection-end-column="33" />
+            <state relative-caret-position="169">
+              <caret line="166" column="4" selection-start-line="166" selection-start-column="4" selection-end-line="166" selection-end-column="4" />
+              <folding>
+                <element signature="e#24#46#0" expanded="true" />
+                <element signature="e#1557#2114#0" />
+                <element signature="e#3546#3771#0" />
+                <element signature="e#6151#6847#0" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="listAll.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/listAll.xml">
+      <file leaf-file-name="builtins.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/.PyCharm2018.1/system/python_stubs/626668982/builtins.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="13" column="65" lean-forward="true" selection-start-line="13" selection-start-column="65" selection-end-line="13" selection-end-column="65" />
+            <state relative-caret-position="-138">
+              <caret line="339" column="18" lean-forward="true" selection-start-line="339" selection-start-column="18" selection-end-line="339" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -78,33 +102,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="minidom.py" pinned="false" current-in-tab="false">
-        <entry file="file://D:/Apps/Anacoda/Lib/xml/dom/minidom.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30430">
-              <caret line="1795" selection-start-line="1795" selection-end-line="1795" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
-        <entry file="file://D:/Apps/Anacoda/Lib/site-packages/requests/models.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="14586">
-              <caret line="891" selection-start-line="891" selection-end-line="891" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
-        <entry file="file://D:/Apps/Anacoda/Lib/json/__init__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5967">
-              <caret line="353" selection-start-line="353" selection-end-line="353" />
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -113,6 +110,12 @@
         <option value="Python Script" />
       </list>
     </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>final</find>
+      <find>Englisch description</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -125,6 +128,7 @@
         <option value="$PROJECT_DIR$/src/DataSearch/try.py" />
         <option value="$PROJECT_DIR$/src/reg.py" />
         <option value="$PROJECT_DIR$/src/try.py" />
+        <option value="$PROJECT_DIR$/src/listAll.xml" />
         <option value="$PROJECT_DIR$/src/DataSearch/utility.py" />
         <option value="$PROJECT_DIR$/src/test.py" />
       </list>
@@ -160,6 +164,23 @@
               <item name="HeyDr.Jo" type="b2602c69:ProjectViewProjectNode" />
               <item name="HeyDr.Jo" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HeyDr.Jo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HeyDr.Jo" type="462c0819:PsiDirectoryNode" />
+              <item name="WebSite" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HeyDr.Jo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HeyDr.Jo" type="462c0819:PsiDirectoryNode" />
+              <item name="WebSite" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HeyDr.Jo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HeyDr.Jo" type="462c0819:PsiDirectoryNode" />
+              <item name="WebSite" type="462c0819:PsiDirectoryNode" />
+              <item name="WebSite" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="HeyDr.Jo" type="b2602c69:ProjectViewProjectNode" />
@@ -331,16 +352,15 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-6" y="-6" width="1381" height="895" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.5529412" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.22614379" />
       <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.28647014" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.28647014" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3281046" />
@@ -392,25 +412,70 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/DataSearch/utility.py</url>
-          <line>193</line>
+          <line>206</line>
           <option name="timeStamp" value="37" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/DataSearch/utility.py</url>
-          <line>168</line>
+          <line>181</line>
           <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/DataSearch/utility.py</url>
+          <line>258</line>
+          <option name="timeStamp" value="56" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/test.py</url>
-          <line>18</line>
-          <option name="timeStamp" value="40" />
+          <line>9</line>
+          <option name="timeStamp" value="57" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="45" />
+      <option name="time" value="58" />
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="final" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
+      <expression>
+        <expression-string>add = 'https://en.wikipedia.org/w/api.php?action=query&amp;titles= %s &amp;prop=extracts&amp;exintro&amp;format=json&amp;formatversion=2' % ('baroque')
+datas = requests.get(add).json()
+querry = datas['query']
+page = querry['pages'][0]
+text = page['extract']
+final += 'Englisch description: '
+final += re.sub(r'&lt;.*?&gt;', '', text)
+print(final)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>add = 'https://en.wikipedia.org/w/api.php?action=query&amp;titles= %s &amp;prop=extracts&amp;exintro&amp;format=json&amp;formatversion=2' % ('rice')
+datas = requests.get(add).json()
+querry = datas['query']
+page = querry['pages'][0]
+text = page['extract']
+final += 'Englisch description: '
+final += re.sub(r'&lt;.*?&gt;', '', text)
+print(final)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>add = 'https://en.wikipedia.org/w/api.php?action=query&amp;titles= %s &amp;prop=extracts&amp;exintro&amp;format=json&amp;formatversion=2' % ('rice')
+datas = requests.get(add).json()
+querry = datas['query']
+page = querry['pages'][0]
+text = page['extract']
+final += 'Englisch description: '
+final += re.sub(r'&lt;.*?&gt;', '', text)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>f = open(fpath, 'w', encoding='utf-8')
 doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='utf-8')
@@ -445,38 +510,9 @@ doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='utf-8')</expre
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
-      <expression>
-        <expression-string>doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='asdasdas')</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='')</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='unicode')</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/DataSearch/utility.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2346">
-          <caret line="143" selection-start-line="140" selection-start-column="4" selection-end-line="143" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Apps/Anacoda/Lib/xml/dom/minidom.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30515">
-          <caret line="1795" selection-start-line="1795" selection-end-line="1795" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/Apps/Anacoda/Lib/site-packages/requests/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15147">
@@ -502,6 +538,12 @@ doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='utf-8')</expre
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1377">
           <caret line="83" selection-start-line="83" selection-end-line="83" />
+          <folding>
+            <element signature="e#24#46#0" expanded="true" />
+            <element signature="e#1557#2114#0" />
+            <element signature="e#3546#3771#0" />
+            <element signature="e#6151#6847#0" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -550,6 +592,12 @@ doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='utf-8')</expre
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="935">
           <caret line="56" column="20" lean-forward="true" selection-start-line="53" selection-start-column="3" selection-end-line="56" selection-end-column="20" />
+          <folding>
+            <element signature="e#24#46#0" expanded="true" />
+            <element signature="e#1557#2114#0" />
+            <element signature="e#3546#3771#0" />
+            <element signature="e#6151#6847#0" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -602,7 +650,16 @@ doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='utf-8')</expre
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/DataSearch/utility.py">
-      <provider selected="true" editor-type-id="text-editor" />
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#24#46#0" expanded="true" />
+            <element signature="e#1557#2114#0" />
+            <element signature="e#3546#3771#0" />
+            <element signature="e#6151#6847#0" />
+          </folding>
+        </state>
+      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/try.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -750,20 +807,6 @@ doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='utf-8')</expre
         </state>
       </provider>
     </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Apps/Anacoda/Lib/codecs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="331" selection-start-line="331" selection-end-line="331" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18139">
@@ -789,13 +832,6 @@ doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='utf-8')</expre
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="14586">
           <caret line="891" selection-start-line="891" selection-end-line="891" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/try.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" column="17" selection-start-line="16" selection-start-column="17" selection-end-line="16" selection-end-column="17" />
         </state>
       </provider>
     </entry>
@@ -826,24 +862,61 @@ doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='utf-8')</expre
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2018.1/system/python_stubs/626668982/builtins.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-138">
+          <caret line="339" column="18" lean-forward="true" selection-start-line="339" selection-start-column="18" selection-end-line="339" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Apps/Anacoda/Lib/codecs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="169">
+          <caret line="310" selection-start-line="310" selection-end-line="310" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/try.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" column="17" selection-start-line="16" selection-start-column="17" selection-end-line="16" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/listAll.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" column="65" lean-forward="true" selection-start-line="13" selection-start-column="65" selection-end-line="13" selection-end-column="65" />
+        <state relative-caret-position="-16937">
+          <caret line="1" column="4" selection-start-line="1" selection-start-column="4" selection-end-line="1" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/DataSearch/utility.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-34">
-          <caret line="167" column="33" selection-start-line="167" selection-start-column="33" selection-end-line="167" selection-end-column="33" />
+        <state relative-caret-position="169">
+          <caret line="166" column="4" selection-start-line="166" selection-start-column="4" selection-end-line="166" selection-end-column="4" />
+          <folding>
+            <element signature="e#24#46#0" expanded="true" />
+            <element signature="e#1557#2114#0" />
+            <element signature="e#3546#3771#0" />
+            <element signature="e#6151#6847#0" />
+          </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/generatedDataSet.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="12" column="19" selection-start-line="12" selection-start-column="19" selection-end-line="12" selection-end-column="19" />
+        <state relative-caret-position="389">
+          <caret line="24" column="48" lean-forward="true" selection-start-line="24" selection-start-column="48" selection-end-line="24" selection-end-column="48" />
           <folding>
             <element signature="e#25#59#0" expanded="true" />
           </folding>
