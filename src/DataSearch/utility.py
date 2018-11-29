@@ -7,14 +7,14 @@ from xml.dom.minidom import Document
 from json.decoder import JSONDecodeError
 
 
-def get_start_info(number, root):
+def get_start_info(ref, root):
     """
     This method will search the title, name of artist and the created year from xml.
 
     Parameters
     ----------
-    number: :str
-        Reference number of the object
+    ref: :str
+        Reference number or title of the object
 
     root: :str
         root of xml
@@ -27,15 +27,26 @@ def get_start_info(number, root):
 
     year ::str
     """
+
     record = None
-    refnumberlist = root.getiterator('priref')
-    for refnumber in refnumberlist:
-        if refnumber.text == number:
-            record = refnumber.getparent()
-            break
+    if len(ref)<= 4:
+        refnumberlist = root.getiterator('priref')
+        for refnumber in refnumberlist:
+            if refnumber.text == ref:
+                record = refnumber.getparent()
+                break
+    else:
+        titleList = root.getiterator('Title')
+        pattern = '(%s).*'%(ref)
+        for bigtitle in titleList:
+            title = bigtitle.find('.//title')
+            if re.search(pattern,title.text) is not None:
+                record = title.getparent().getparent()
+                break
     ###Title######
-    title = record.find('.//title')
-    titlestr = title.text
+    title = record.find('.//Title')
+    tt = title.find('.//title')
+    titlestr = tt.text
     ###artist#####
     creator = record.find('.//Creator')
     name = creator.find('.//name')
@@ -44,19 +55,56 @@ def get_start_info(number, root):
     product = record.find('.//Production_date')
     pre = ''
     end = ''
-
     anfang = product.find('.//production.date.start').text
     try:
         pre = product.find('.//production.date.start.prec').text
         end = product.find('.//production.date.end').text
         time = pre + ' ' + anfang + ' - ' + end
-        return titlestr, namestr, time
-    except AttributeError:
+        return titlestr, namestr, time,record
+    except (AttributeError,ValueError):
         end = 'oop'
     time = anfang
-
-
     return titlestr, namestr, time, record
+
+
+
+def get_details(record):
+    dict = {}
+    title = record.find('.//Title')
+    tt = title.find('.//title')
+    titlestr = tt.text
+    dict['title'] = titlestr
+    ##Diemension##
+    height = ''
+    width = ''
+    dimens = record.getiterator('Dimension')
+    for dim in dimens:
+        if dim.find('.//term').get('occurrence') == '1':
+            height = dim.find('.//dimension.value').text
+            continue
+        width = dim.find('.//dimension.value').text
+        dimension = ' It is %s cm high, %s cm width.\n'%(height,width)
+        dict['height'] = height
+        dict['width'] = width
+        break
+    else:
+        dimension = ''
+    ##style##
+    style = get_text_value(record,'.//school_style')
+    ###technik##
+    technik = get_text_value(record,'.//technique')
+    ####Art
+    art = get_text_value(record,'.//object_name')
+    ####artist
+    creator = record.find('.//Creator')
+    name = creator.find('.//name')
+    artist = name.text
+    dict['style'] = style
+    dict['technik'] = technik
+    dict['art'] = art
+    dict['artist'] = artist
+    detail_Info = 'The \'%s\' is a %s %s in style %s created by %s.%s'%(titlestr, technik, art, style, artist,dimension)
+    return detail_Info,dict
 
 
 def name_API(str):
@@ -106,6 +154,7 @@ def search_wiki(namestr):
             if description['lang'] == 'en':
                 final = 'Englisch description: '+description['value']
                 return final
+        for description in descriptionList:
             if description['lang'] == 'de':
                 final = 'German description: '+description['value']
                 return final
@@ -160,9 +209,35 @@ def search_artist_xml(name,root):
     artistList = root.getiterator('Artist')
     for artist in artistList:
         if artist.attrib['name'] == name :
-            desc = artist.find('.//descriprion')
+            desc = artist.find('.//description')
             return desc.text
     return search_wiki(name)
+
+
+def search_style_xml(name,root):
+    """
+        This method will search the description of style in the data set. If it is not in data set, then search it in internet.
+
+        Parameters
+        ----------
+        name: :str
+            name of style
+
+        root: :str
+            root of data set
+
+        Returns
+        -------
+        description ::str
+
+        """
+    artistList = root.getiterator('style')
+    for artist in artistList:
+        if artist.attrib['stylename'] == name :
+            desc = artist.find('.//description')
+            return desc.text
+    return search_wiki(name)
+
 
 def create_artist_datenSet(listSum, fpath):
     doc = Document()  # create DOM object
@@ -175,7 +250,7 @@ def create_artist_datenSet(listSum, fpath):
         artist = doc.createElement('Artist')
         artist.setAttribute('name', listSum[0][i])
         AllPerson.appendChild(artist)
-        descrip = doc.createElement('descriprion')
+        descrip = doc.createElement('description')
         artist.appendChild(descrip)
         text = doc.createTextNode((listSum[1][i]).encode('utf-8').decode('utf-8'))
         descrip.appendChild(text)
@@ -209,9 +284,9 @@ def getAllArtist(root):
     return sumList
 
 
-def get_style(record):
+def get_text_value(record,tagname):
     try:
-        style = record.find('school_style')
+        style = record.find(tagname)
         termList = style.getiterator('term')
         for term in termList:
             if term.get('lang')=='en-GB':
@@ -229,7 +304,7 @@ def getAllStyle(root):
     pretime = time.time()
     for record in recordList:
         pre = time.time()
-        style = get_style(record)
+        style = get_text_value(record,'school_style')
         if (style in listStyle) or style == 'Nothing': continue
         listStyle.append(style)
         description = search_wiki(style)
@@ -252,13 +327,9 @@ def create_style_tree(listSum,fpath,outpath):
         styles = etree.Element('style')
         styles.set('stylename', listSum[0][i])
         all_style.append(styles)
-        descrip = etree.Element('descriprion')
+        descrip = etree.Element('description')
         styles.append(descrip)
         # text = etree.Element((listSum[1][i]))
         descrip.text = listSum[1][i]
     root.append(all_style)
     tree.write(outpath, encoding="utf-8",xml_declaration=True)
-    # f = open(fpath, 'w', encoding='utf-8')
-    #
-    # doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='utf-8')
-    # f.close()
