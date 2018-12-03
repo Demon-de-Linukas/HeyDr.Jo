@@ -40,9 +40,12 @@ def get_start_info(ref, root):
         pattern = '(%s).*'%(ref)
         for bigtitle in titleList:
             title = bigtitle.find('.//title')
-            if re.search(pattern,title.text) is not None:
+            if re.match(pattern,title.text):
                 record = title.getparent().getparent()
                 break
+    ###refNum#####
+    ref = record.find('.//priref')
+    refnumber = ref.text
     ###Title######
     title = record.find('.//Title')
     tt = title.find('.//title')
@@ -60,11 +63,11 @@ def get_start_info(ref, root):
         pre = product.find('.//production.date.start.prec').text
         end = product.find('.//production.date.end').text
         time = pre + ' ' + anfang + ' - ' + end
-        return titlestr, namestr, time,record
+        return titlestr, namestr, time,refnumber,record
     except (AttributeError,ValueError):
         end = 'oop'
     time = anfang
-    return titlestr, namestr, time, record
+    return titlestr, namestr, time, refnumber, record
 
 
 
