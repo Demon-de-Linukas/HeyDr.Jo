@@ -1,14 +1,14 @@
-import time
+import datetime
 import telebot as tb
 from lxml import etree
-from DataSearch import utility as ut
-from ChatBot import dictionary as cc
+from src.DataSearch import utility as ut
+from src.ChatBot import dictionary as cc
 
 
 token = '706415631:AAG1Y6sfLmvxU_TENOaVwGA3hzXdaGJiaWo'
-pathOfPhoto = 'C:/Users\linuk\Downloads\Staedel_Teilset\Abbildungen_Teilset/'
-pathOfDataset = 'C:/Users\linuk\Downloads\Staedel_Teilset/Objekte.xml'
-pathOfGene = 'C:/Users\linuk\Workspace\HeyDr.Jo\src/ChatBot/generatedDataSet.xml'
+pathOfPhoto = 'C:/Users\linuk\Desktop\Staedel\Abbildungen/'
+pathOfDataset = 'C:/Users\linuk\Desktop\Staedel/Objekte.xml'
+pathOfGene = 'D:\Workspace_Pycharm\HeyDr.Jo\src\ChatBot\generatedDataSet.xml'
 tree = etree.parse(pathOfDataset)
 root = tree.getroot()
 __currentrecord__ = None
@@ -87,6 +87,9 @@ def get_input(message):#List):
             bot.send_message(chatid,  u'Please give the number or the name of your interested object!')
             __knowInfo__ = 0
             return
+        elif message.text.upper() in ['HI','HELLO','HALLO','GOOD MORNING']:
+            greating(message)
+            return
         else:
             print(str(__knowInfo__))
             #for message in messageList:
@@ -106,8 +109,17 @@ def get_input(message):#List):
         bot.send_message(chatid,'Sorry I don\'t understand!')
 
 
+@bot.message_handler(content_types=['text'])
+def greating(message):
+    bot.reply_to(message, '%s!' % message.text)
+    send_welcome(message)
+
+
 if __name__ == '__main__':
-        #bot.set_update_listener(get_input)
-        while True:
-            bot.polling(none_stop=True)
-            time.sleep(1)
+    time = datetime.datetime.now()
+    #    print Exception
+    print("Bot started: " + str(time))
+    #bot.set_update_listener(get_input)
+    while True:
+        bot.polling(none_stop=True)
+        time.sleep(0.5)
