@@ -2,14 +2,14 @@ import datetime
 import telebot as tb
 import random
 from lxml import etree
-from DataSearch import utility as ut
-from ChatBot import dictionary as cc
+from src.DataSearch import utility as ut
+from src.ChatBot import dictionary as cc
 
 
 token = '706415631:AAG1Y6sfLmvxU_TENOaVwGA3hzXdaGJiaWo'
-pathOfPhoto = 'C:/Users\linuk\Downloads\Staedel_Teilset\Abbildungen_Teilset/'
-pathOfDataset = 'C:/Users\linuk\Downloads\Staedel_Teilset/Objekte.xml'
-pathOfGene = 'C:/Users\linuk\Workspace\HeyDr.Jo\src\ChatBot\generatedDataSet.xml'
+pathOfPhoto = 'C:/Users\linuk\Desktop\Staedel\Abbildungen/compressed/'
+pathOfDataset = 'C:/Users\linuk\Desktop\Staedel/Objekte.xml'
+pathOfGene = 'D:\Workspace_Pycharm\HeyDr.Jo\src\ChatBot\generatedDataSet.xml'
 tree = etree.parse(pathOfDataset)
 root = tree.getroot()
 __currentrecord__ = None
@@ -32,56 +32,57 @@ def get_semantic(text,dict):
 def get_from_data(command,rootAll,rootGene):
     return ut.get_start_info(command,rootAll)
 
-
-@bot.message_handler(commands=[''])
+@bot.message_handler(commands=['server'])
 def send_welcome(message):
+    global __knowInfo__,__currentrecord__,__artistName__,__style__
+    bot.reply_to(message, 'Step:%s\nArtist:%s\nStyle:%s'%(__knowInfo__,__artistName__,__style__))
+
+
+@bot.message_handler(commands=['start', 'help', 'restart'])
+def send_welcome(message):
+    global __knowInfo__,__currentrecord__
+    if 'restart'in message.text:
+        __knowInfo__ = 0
+        __currentrecord__ = None
     bot.reply_to(message, u"Dear customer, I am Dr. Jo! "
                           u"\nToday I will be your museum guide "
                           u"and provide you some professional and interesting information about our art objects! "
                           u"\nWhich object are you currently looking at or interested in? ")
 
 
+
+
 @bot.message_handler(content_types='text')
-def get_input(message):#List):
+def get_input(message):
+    print(message.text)
     try:
         global __currentrecord__, __knowInfo__, __artistName__, __style__, __dict__
         chatid = message.chat.id
-        #if message.text.upper() == 'YES' and __knowInfo__ == 1:
-          #  detail_Info, dict = ut.get_details(__currentrecord__)
-           # __artistName__ = dict['artist']
-           # __style__ = dict['style']
-           # bot.reply_to(message, detail_Info)
-            #chatid = message.chat.id
-           # __knowInfo__=2
-            #return
         if message.text.lower() in __dict__['yes'] and __knowInfo__== 2:
             chatid = message.chat.id
             bot.send_message(chatid,u'What would you like to know, ' \
                 ' introductions about the artist or style or some related objects of this object in our museum?' \
-                '\n(artist,style,related objects)')
+                '\n\n[artist,style,related objects]')
             __knowInfo__=3
             return
         elif message.text.upper()=="ARTIST" and __knowInfo__==3:
             chatid=message.chat.id
             bot.send_message(chatid, ut.search_artist_xml(__artistName__,rootGene) )
             __knowInfo__ = 2
-            bot.send_message(chatid, u'\n\n\nWould you like to know about the style or '
-                                     u'related objects of this object in our museum? ')
+            bot.send_message(chatid, u'\n\n\nDo you want to know more Information?\n\n[Yes or No]')
             return
         elif message.text.upper()=="STYLE" and __knowInfo__==3 :
             chatid = message.chat.id
             bot.send_message(chatid,ut.search_style_xml(__style__,rootGene))
             __knowInfo__ = 2
-            bot.send_message(chatid, u'\n\n\nWould you like to know about the artist or '
-                                     u'related objects of this object in our museum? ')
+            bot.send_message(chatid, u'\n\n\nDo you want to know more information?\n\n[Yes or No]')
             return
 
         elif message.text.upper()=="RELATED OBJECTS" and __knowInfo__==3:
             chatid = message.chat.id
             bot.send_message(chatid, u'still working, Coming Soon...')
             __knowInfo__= 2
-            bot.send_message(chatid, u'\n\n\nWould you like to know about the style or '
-                                     u'artist of this object? ')
+            bot.send_message(chatid, u'\n\n\nDo you want to know more Information?\n\n[Yes or No]')
             return
 
         elif message.text.upper() == 'NO':
@@ -99,7 +100,7 @@ def get_input(message):#List):
             m = random.choice(__dict__['bye'])
             bot. send_message(chatid,m)
 
-        else:
+        elif __knowInfo__ == 0:
             print(str(__knowInfo__))
             #for message in messageList:
             title, artist, period, refnum,record = get_from_data(message.text, root, rootGene)
@@ -118,8 +119,15 @@ def get_input(message):#List):
             bot.send_message(chatid,  u'Should I introduce more information about the artist or style of this object?')
             __knowInfo__ =2
             return
+        elif (message.text.upper() !="ARTIST" and message.text.upper()!="STYLE" and message.text.upper()!="RELATED OBJECTS")\
+                and __knowInfo__!=3 and len(message.text)>3:
+            tt = ut.search_wiki(message.text)
+            bot.reply_to(message,tt)
+        else:
+            bot.send_message(chatid, 'Sorry I don\'t understand! Please follow the instruction above!')
     except (AttributeError):
-        bot.send_message(chatid,'Sorry I don\'t understand!')
+        bot.send_message(chatid,'Sorry I don\'t understand! Please follow the instruction above or check the input!')
+        return
 
 
 @bot.message_handler(content_types=['text'])

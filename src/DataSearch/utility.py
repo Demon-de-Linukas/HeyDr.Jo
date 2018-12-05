@@ -30,7 +30,7 @@ def get_start_info(ref, root):
 
     record = None
     if len(ref)<= 4:
-        refnumberlist = root.getiterator('priref')
+        refnumberlist = root.getiterator('object_number')
         for refnumber in refnumberlist:
             if refnumber.text == ref:
                 record = refnumber.getparent()
@@ -44,7 +44,7 @@ def get_start_info(ref, root):
                 record = title.getparent().getparent()
                 break
     ###refNum#####
-    ref = record.find('.//priref')
+    ref = record.find('.//object_number')
     refnumber = ref.text
     ###Title######
     title = record.find('.//Title')
