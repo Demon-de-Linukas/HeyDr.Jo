@@ -4,7 +4,7 @@ import random
 from lxml import etree
 from src.DataSearch import utility as ut
 from src.ChatBot import dictionary as cc
-
+from chatterbot import ChatBot
 
 token = '706415631:AAG1Y6sfLmvxU_TENOaVwGA3hzXdaGJiaWo'
 pathOfPhoto = 'C:/Users\linuk\Desktop\Staedel\Abbildungen/compressed/'
@@ -22,6 +22,16 @@ rootGene = treeGene.getroot()
 __dict__ = cc.dict
 bot = tb.TeleBot(token)
 
+chattingBot = ChatBot("Training Example",
+                      storage_adapter="chatterbot.storage.SQLStorageAdapter",
+                      logic_adapters=[
+                         "chatterbot.logic.MathematicalEvaluation",
+                         # "chatterbot.logic.TimeLogicAdapter",
+                         "chatterbot.logic.BestMatch"
+                     ],
+                      database="../database.db"
+                      )
+
 
 def get_semantic(text,dict):
     for dd in dict:
@@ -31,6 +41,7 @@ def get_semantic(text,dict):
 
 def get_from_data(command,rootAll,rootGene):
     return ut.get_start_info(command,rootAll)
+
 
 @bot.message_handler(commands=['server'])
 def send_welcome(message):
@@ -48,8 +59,6 @@ def send_welcome(message):
                           u"\nToday I will be your museum guide "
                           u"and provide you some professional and interesting information about our art objects! "
                           u"\nWhich object are you currently looking at or interested in? ")
-
-
 
 
 @bot.message_handler(content_types='text')
@@ -124,9 +133,10 @@ def get_input(message):
             tt = ut.search_wiki(message.text)
             bot.reply_to(message,tt)
         else:
-            bot.send_message(chatid, 'Sorry I don\'t understand! Please follow the instruction above!')
-    except (AttributeError):
-        bot.send_message(chatid,'Sorry I don\'t understand! Please follow the instruction above or check the input!')
+            response = chattingBot.get_response(message.text)
+            bot.send_message(chatid, response)
+    except (AttributeError, EOFError):
+        bot.send_message(chatid, 'Sorry I don\'t understand! Please follow the instruction above or check the input!')
         return
 
 
