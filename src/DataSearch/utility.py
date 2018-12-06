@@ -29,10 +29,11 @@ def get_start_info(ref, root):
     """
 
     record = None
-    if len(ref)<= 4:
+    if len(ref)<= 5:
+        ref = ref.replace('_',' ')
         refnumberlist = root.getiterator('object_number')
         for refnumber in refnumberlist:
-            if refnumber.text == ref:
+            if refnumber.text == ref.upper():
                 record = refnumber.getparent()
                 break
     else:
@@ -44,8 +45,8 @@ def get_start_info(ref, root):
                 record = title.getparent().getparent()
                 break
     ###refNum#####
-    ref = record.find('.//object_number')
-    refnumber = ref.text
+    ref = record.find('object_number')
+    refnumber = ref.text.replace(' ','_')
     ###Title######
     title = record.find('.//Title')
     tt = title.find('.//title')
