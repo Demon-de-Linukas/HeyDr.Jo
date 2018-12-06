@@ -16,6 +16,7 @@ __currentrecord__ = None
 __knowInfo__ = 0
 __artistName__ =''
 __style__ = ''
+__chatting__ = False
 
 treeGene = etree.parse(pathOfGene)
 rootGene = treeGene.getroot()
@@ -23,15 +24,29 @@ __dict__ = cc.dict
 bot = tb.TeleBot(token)
 
 chattingBot = ChatBot("Training Example",
+                      read_only=True,
                       storage_adapter="chatterbot.storage.SQLStorageAdapter",
                       logic_adapters=[
-                         "chatterbot.logic.MathematicalEvaluation",
-                         # "chatterbot.logic.TimeLogicAdapter",
-                         "chatterbot.logic.BestMatch"
+                          {'import_path': 'chatterbot.logic.MathematicalEvaluation'
+                           },
+                          {'import_path':'chatterbot.logic.BestMatch'
+                           },
+                          {'import_path':'chatterbot.logic.SpecificResponseAdapter',
+                           'input_text': 'Who are you',
+                           'output_text':'I am Dr. Jo, a chat bot of Städel Museum :-)'}
                      ],
                       database="../database.db"
                       )
 
+
+def init():
+    global __knowInfo__,__currentrecord__,__artistName__,__style__,__chatting__
+    __currentrecord__ = None
+    __knowInfo__ = 0
+    __artistName__ = ''
+    __style__ = ''
+    __chatting__ = False
+    return
 
 def get_semantic(text,dict):
     for dd in dict:
@@ -43,19 +58,30 @@ def get_from_data(command,rootAll,rootGene):
     return ut.get_start_info(command,rootAll)
 
 
+@bot.message_handler(commands=['chat','endChat'])
+def chatter_command(message):
+    global __chatting__
+    init()
+    if message.text.upper()=='/ENDCHAT':
+        __chatting__ = False
+        bot.reply_to(message, 'End chatting. See ya!')
+        return
+    __chatting__ = True
+    bot.reply_to(message, 'Okay, now let\'s chat!\nTo end the chatting and go back to Städel Museum, use command \'/endChat\'!')
+    return
+
+
 @bot.message_handler(commands=['server'])
 def send_welcome(message):
     global __knowInfo__,__currentrecord__,__artistName__,__style__
-    bot.reply_to(message, 'Step:%s\nArtist:%s\nStyle:%s'%(__knowInfo__,__artistName__,__style__))
+    bot.send_message(message.chat.id, 'Step:%s\nArtist:%s\nStyle:%s'%(__knowInfo__,__artistName__,__style__))
 
 
 @bot.message_handler(commands=['start', 'help', 'restart'])
 def send_welcome(message):
-    global __knowInfo__,__currentrecord__
     if 'restart'in message.text:
-        __knowInfo__ = 0
-        __currentrecord__ = None
-    bot.reply_to(message, u"Dear customer, I am Dr. Jo! "
+        init()
+    bot.send_message(message.chat.id, u"Dear customer, I am Dr. Jo! "
                           u"\nToday I will be your museum guide "
                           u"and provide you some professional and interesting information about our art objects! "
                           u"\nWhich object are you currently looking at or interested in? ")
@@ -63,11 +89,24 @@ def send_welcome(message):
 
 @bot.message_handler(content_types='text')
 def get_input(message):
+    global __currentrecord__, __knowInfo__, __artistName__, __style__, __dict__,__chatting__
     print(message.text)
+
     try:
-        global __currentrecord__, __knowInfo__, __artistName__, __style__, __dict__
         chatid = message.chat.id
-        if message.text.lower() in __dict__['yes'] and __knowInfo__== 2:
+        if 'ho are you' in message.text:
+            statment = 'Who are you'
+            response = chattingBot.get_response(statment)
+            bot.send_message(chatid, response)
+            return
+        elif __chatting__:
+            statment = message.text
+            if 'ho are you' in statment:
+                statment = 'Who are you'
+            response = chattingBot.get_response(statment)
+            bot.send_message(chatid, response)
+            return
+        elif message.text.lower() in __dict__['yes'] and __knowInfo__== 2:
             chatid = message.chat.id
             bot.send_message(chatid,u'What would you like to know, ' \
                 ' introductions about the artist or style or some related objects of this object in our museum?' \
@@ -129,20 +168,30 @@ def get_input(message):
             __knowInfo__ =2
             return
         elif (message.text.upper() !="ARTIST" and message.text.upper()!="STYLE" and message.text.upper()!="RELATED OBJECTS")\
-                and __knowInfo__!=3 and len(message.text)>3:
-            tt = ut.search_wiki(message.text)
-            bot.reply_to(message,tt)
+                and __knowInfo__!=3 and len(message.text)>4:
+            # tt = ut.search_wiki(message.text)
+            # bot.reply_to(message,tt)
+            bot.send_message(chatid,
+                             'Sorry I don\'t understand! Please follow the instruction above or check the input!')
+            # response = chattingBot.get_response(message.text)
+            # bot.send_message(chatid, response)
+            return
         else:
-            response = chattingBot.get_response(message.text)
-            bot.send_message(chatid, response)
-    except (AttributeError, EOFError):
-        bot.send_message(chatid, 'Sorry I don\'t understand! Please follow the instruction above or check the input!')
+            bot.send_message(chatid,
+                             'Sorry I don\'t understand! Please follow the instruction above or check the input!')
+
+            # response = chattingBot.get_response(message.text)
+            # bot.send_message(chatid, response)
+            return
+    except (AttributeError, EOFError,IndexError):
+        bot.send_message(chatid, 'Sorry I don\'t understand! Please follow the instruction above or check the input!'
+                                 '\n\nTo restart the chat bot please use command \'/restart\'\nJust want to chat? Try command \'/chat\'! ')
         return
 
 
 @bot.message_handler(content_types=['text'])
 def greating(message):
-    bot.reply_to(message, '%s!' % message.text)
+    bot.send_message(message.chat.id, '%s!'% message.text)
     send_welcome(message)
 
 
