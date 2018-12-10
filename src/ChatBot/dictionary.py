@@ -2,7 +2,7 @@
 dict = {}
 dict['yes'] = ['yes', 'ja', 'ok', 'ye', 'okay', 'jo', 'yo', 'sure']
 dict["no"]=['no', 'nope', 'I don\'t think so']
-dict['hello']=['hi', 'hello', 'hallo', 'good day']
+dict['hello']=['hi', 'hello', 'hallo', 'good day','hi!', 'hello!', 'hallo!', 'good day!']
 dict['thanks']=['thanks', 'thank you', 'i appreciate it', 'that\'s nice of you', 'thx']
 dict['bye']=['bye', 'goodbye', 'ciao', 'see ya', 'so long']
 dict['you are welcome']=['You are welcome.', 'My pleasure.']

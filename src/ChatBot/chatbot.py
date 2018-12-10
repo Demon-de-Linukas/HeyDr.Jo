@@ -1,10 +1,14 @@
 import datetime
 import telebot as tb
 import random
+import pandas as pd
+
 from lxml import etree
-from src.DataSearch import utility as ut
-from src.ChatBot import dictionary as cc
+from DataSearch import utility as ut
+from ChatBot import dictionary as cc
 from chatterbot import ChatBot
+
+import csv
 
 token = '706415631:AAG1Y6sfLmvxU_TENOaVwGA3hzXdaGJiaWo'
 pathOfPhoto = 'C:/Users\linuk\Desktop\Staedel\Abbildungen/compressed/'
@@ -12,16 +16,13 @@ pathOfDataset = 'C:/Users\linuk\Desktop\Staedel/Objekte.xml'
 pathOfGene = 'D:\Workspace_Pycharm\HeyDr.Jo\src\ChatBot\generatedDataSet.xml'
 tree = etree.parse(pathOfDataset)
 root = tree.getroot()
-__currentrecord__ = None
-__knowInfo__ = 0
-__artistName__ =''
-__style__ = ''
-__chatting__ = False
-
 treeGene = etree.parse(pathOfGene)
 rootGene = treeGene.getroot()
 __dict__ = cc.dict
 bot = tb.TeleBot(token)
+
+logPath = 'userCache.csv'
+fieldnames = ['userID', 'knowInfo', 'artist', 'style', 'period', 'chatting']
 
 chattingBot = ChatBot("Training Example",
                       read_only=True,
@@ -29,68 +30,95 @@ chattingBot = ChatBot("Training Example",
                       logic_adapters=[
                           {'import_path': 'chatterbot.logic.MathematicalEvaluation'
                            },
-                          {'import_path':'chatterbot.logic.BestMatch'
+                          {'import_path': 'chatterbot.logic.BestMatch'
                            },
-                          {'import_path':'chatterbot.logic.SpecificResponseAdapter',
+                          {'import_path': 'chatterbot.logic.SpecificResponseAdapter',
                            'input_text': 'Who are you',
-                           'output_text':'I am Dr. Jo, a chat bot of Städel Museum :-)'}
-                     ],
+                           'output_text': 'I am Dr. Jo, a chat bot of Städel Museum :-)'}
+                      ],
                       database="../database.db"
                       )
 
 
-def init():
-    global __knowInfo__,__currentrecord__,__artistName__,__style__,__chatting__
-    __currentrecord__ = None
-    __knowInfo__ = 0
-    __artistName__ = ''
-    __style__ = ''
-    __chatting__ = False
+def init(userid):
+    write_user_cache(userid, 'knowInfo', '0')
+    write_user_cache(userid, 'artist', '')
+    write_user_cache(userid, 'style', '')
+    write_user_cache(userid, 'period', '')
+    write_user_cache(userid, 'chatting', 'False')
     return
 
-def get_semantic(text,dict):
+
+def get_semantic(text, dict):
     for dd in dict:
         if text in dict[dd]:
-           return dd
+            return dd
 
 
-def get_from_data(command,rootAll,rootGene):
-    return ut.get_start_info(command,rootAll)
+def get_from_data(command, rootAll, rootGene):
+    return ut.get_start_info(command, rootAll)
 
 
-@bot.message_handler(commands=['chat','endChat'])
+@bot.message_handler(commands=['chat', 'endChat'])
 def chatter_command(message):
-    global __chatting__
-    init()
-    if message.text.upper()=='/ENDCHAT':
-        __chatting__ = False
+    userid = str(message.from_user.id)
+    init(userid)
+    if message.text.upper() == '/ENDCHAT':
+        write_user_cache(userid, 'chatting', 'False')
         bot.reply_to(message, 'End chatting. See ya!')
         return
-    __chatting__ = True
-    bot.reply_to(message, 'Okay, now let\'s chat!\nTo end the chatting and go back to Städel Museum, use command \'/endChat\'!')
+    write_user_cache(userid, 'chatting', 'True')
+    bot.reply_to(message,
+                 'Okay, now let\'s chat!\nTo end the chatting and go back to Städel Museum, use command \'/endChat\'!')
     return
 
 
 @bot.message_handler(commands=['server'])
 def send_welcome(message):
-    global __knowInfo__,__currentrecord__,__artistName__,__style__
-    bot.send_message(message.chat.id, 'Step:%s\nArtist:%s\nStyle:%s'%(__knowInfo__,__artistName__,__style__))
+    userid = str(message.from_user.id)
+    bot.send_message(message.chat.id, 'Step:%s\nArtist:%s\nStyle:%s' % (get_user_cache(userid, 'knowInfo'),
+                                                                        get_user_cache(userid, 'artist'),
+                                                                        get_user_cache(userid, 'style')))
 
 
 @bot.message_handler(commands=['start', 'help', 'restart'])
 def send_welcome(message):
-    if 'restart'in message.text:
-        init()
-    bot.send_message(message.chat.id, u"Dear customer, I am Dr. Jo! "
-                          u"\nToday I will be your museum guide "
-                          u"and provide you some professional and interesting information about our art objects! "
-                          u"\nWhich object are you currently looking at or interested in? ")
+    userid = str(message.from_user.id)
+    init(userid)
+    bot.send_message(message.chat.id, 'Welcome to Hey Dr.Jo chat bot!\nTo start visiting meseum please enter'
+                                  ' /visit\nTo chat with me please use command /chat.'
+                                  '\nTo restart the chat bot please use command /restart.')
+
+
+@bot.message_handler(commands=['visit'])
+def greating(message):
+    bot.send_message(message.chat.id, "Dear customer, I am Dr. Jo!\n"
+                                      "Today I will be your museum guide and provide you some "
+                                      "professional and interesting information about our art objects!\n\n"
+                                      "Which object are you currently looking at or interested in?\n\n"
+
+                                      "[<b>Ref. number</b> or <b>Title</b> of object]", parse_mode='HTML')
 
 
 @bot.message_handler(content_types='text')
 def get_input(message):
-    global __currentrecord__, __knowInfo__, __artistName__, __style__, __dict__,__chatting__
+    global logpath
     print(message.text)
+    with open(logPath, "rt", encoding='utf-8') as log:
+        reader = csv.DictReader(log)
+        userList = [row['userID'] for row in reader]
+    userid = str(message.from_user.id)
+    if userid not in userList:
+        initCache(userid)
+
+    try:
+        chatting = get_user_cache(userid, 'chatting')
+        knowInfo = get_user_cache(userid, 'knowInfo')
+        artist = get_user_cache(userid, 'artist')
+        style = get_user_cache(userid, 'style')
+        period = get_user_cache(userid, 'period')
+    except (AttributeError):
+        print('Creating new user cache...')
 
     try:
         chatid = message.chat.id
@@ -99,107 +127,144 @@ def get_input(message):
             response = chattingBot.get_response(statment)
             bot.send_message(chatid, response)
             return
-        elif __chatting__:
+        elif get_user_cache(userid, 'chatting')=='True':
             statment = message.text
-            if 'ho are you' in statment:
-                statment = 'Who are you'
             response = chattingBot.get_response(statment)
             bot.send_message(chatid, response)
             return
-        elif message.text.lower() in __dict__['yes'] and __knowInfo__== 2:
+        elif message.text.lower() in __dict__['yes'] and get_user_cache(userid, 'knowInfo') == '2':
             chatid = message.chat.id
-            bot.send_message(chatid,u'What would you like to know, ' \
-                ' introductions about the artist or style or some related objects of this object in our museum?' \
-                '\n\n[artist,style,related objects]')
-            __knowInfo__=3
+            bot.send_message(chatid, u'What would you like to know, ' \
+                                     'introductions about the artist, time, style or some related objects of this object in our museum?' \
+                                     '\n\n[<b>artist,time,style</b>]', parse_mode='HTML')
+            write_user_cache(userid=userid,key='knowInfo',value='3')
             return
-        elif message.text.upper()=="ARTIST" and __knowInfo__==3:
-            chatid=message.chat.id
-            bot.send_message(chatid, ut.search_artist_xml(__artistName__,rootGene) )
-            __knowInfo__ = 2
+        elif message.text.upper() == "ARTIST" and get_user_cache(userid, 'knowInfo') == '3':
+            chatid = message.chat.id
+            bot.send_message(chatid, ut.search_artist_xml(get_user_cache(userid, 'artist'), rootGene))
+            write_user_cache(userid=userid,key='knowInfo',value='2')
             bot.send_message(chatid, u'\n\n\nDo you want to know more Information?\n\n[Yes or No]')
             return
-        elif message.text.upper()=="STYLE" and __knowInfo__==3 :
+        elif message.text.upper() == "STYLE" and get_user_cache(userid, 'knowInfo') == '3':
             chatid = message.chat.id
-            bot.send_message(chatid,ut.search_style_xml(__style__,rootGene))
-            __knowInfo__ = 2
+            bot.send_message(chatid, ut.search_style_xml(get_user_cache(userid, 'style'), rootGene))
+            write_user_cache(userid=userid,key='knowInfo',value='2')
             bot.send_message(chatid, u'\n\n\nDo you want to know more information?\n\n[Yes or No]')
             return
 
-        elif message.text.upper()=="RELATED OBJECTS" and __knowInfo__==3:
+        elif message.text.upper() == "TIME" and get_user_cache(userid, 'knowInfo') == '3':
+            chatid = message.chat.id
+            bot.send_message(chatid, search_Time(get_user_cache(userid, 'period')))
+            write_user_cache(userid=userid,key='knowInfo',value='2')
+            bot.send_message(chatid, u'\n\n\nDo you want to know more information?\n\n[Yes or No]')
+            return
+
+        elif message.text.upper() == "RELATED OBJECTS" and get_user_cache(userid, 'knowInfo') == '3':
             chatid = message.chat.id
             bot.send_message(chatid, u'still working, Coming Soon...')
-            __knowInfo__= 2
-            bot.send_message(chatid, u'\n\n\nDo you want to know more Information?\n\n[Yes or No]')
+            write_user_cache(userid=userid,key='knowInfo',value='2')
+            bot.send_message(chatid, u'\n\n\nDo you want to know more Information?\n\n[<b>Yes</b> or <b>No</b>]',
+                             parse_mode='HTML')
             return
 
         elif message.text.upper() == 'NO':
-            bot.send_message(chatid,  u'Please give the number or the name of your interested object!')
-            __knowInfo__ = 0
+            bot.send_message(chatid, u'Please give the number or the name of your interested object!')
+            write_user_cache(userid=userid,key='knowInfo',value='0')
             return
         elif message.text.lower() in __dict__['hello']:
-           greating(message)
-           return
+            greating(message)
+            return
         elif message.text.lower() in __dict__['thanks']:
-            n=random.choice(__dict__['you are welcome'])
-            bot.send_message(chatid,n)
+            n = random.choice(__dict__['you are welcome'])
+            bot.send_message(chatid, n)
             return
         elif message.text.lower() in __dict__['bye']:
             m = random.choice(__dict__['bye'])
-            bot. send_message(chatid,m)
+            bot.send_message(chatid, m)
 
-        elif __knowInfo__ == 0:
-            print(str(__knowInfo__))
-            #for message in messageList:
-            title, artist, period, refnum,record = get_from_data(message.text, root, rootGene)
-            __artistName__ = artist
-            __currentrecord__ = record
-            detail_Info, listing = ut.get_details(__currentrecord__)
-            __style__ = listing['style']
-            bot.reply_to(message, 'Title: \n%s\n\nCreator: \n%s\n\nCreated period: \n%s\n\n\n%s'%(title,artist,period,detail_Info))
+        elif get_user_cache(userid, 'knowInfo') == '0':
+            print(get_user_cache(userid, 'knowInfo'))
+            # for message in messageList:
+            title, artist, period, refnum, record = ut.get_start_info(message.text, root)
+            detail_Info, listing = ut.get_details(record)
+
+            write_user_cache(userid,'knowInfo','0' )
+            write_user_cache(userid,'artist',artist )
+            write_user_cache(userid,'style',listing['style'] )
+            write_user_cache(userid,'period',period )
+            write_user_cache(userid,'chatting','False' )
+
+            bot.reply_to(message, 'Title: \n%s\n\nCreator: \n%s\n\nCreated period: \n%s\n\n\n%s' % (
+            title, artist, period, detail_Info))
 
             try:
-                photo = open(pathOfPhoto+refnum+'.png','rb')
+                photo = open(pathOfPhoto + refnum + '.png', 'rb')
                 bot.send_message(chatid, u'Sending photo... Please wait')
-                bot.send_photo(chatid,photo)
+                bot.send_photo(chatid, photo)
             except (FileNotFoundError):
                 print('no photo')
-            bot.send_message(chatid,  u'Should I introduce more information about the artist or style of this object?')
-            __knowInfo__ =2
+            bot.send_message(chatid,
+                             u'Should I introduce more information about the artist or style of this object?\n\n[<b>Yes</b> or <b>No</b>]',
+                             parse_mode='HTML')
+            write_user_cache(userid=userid,key='knowInfo',value='2')
             return
-        elif (message.text.upper() !="ARTIST" and message.text.upper()!="STYLE" and message.text.upper()!="RELATED OBJECTS")\
-                and __knowInfo__!=3 and len(message.text)>4:
-            # tt = ut.search_wiki(message.text)
-            # bot.reply_to(message,tt)
+        elif (
+                message.text.upper() != "ARTIST" and message.text.upper() != "STYLE" and message.text.upper() != "RELATED OBJECTS") \
+                and get_user_cache(userid, 'knowInfo') != '3' and len(message.text) > 4:
             bot.send_message(chatid,
                              'Sorry I don\'t understand! Please follow the instruction above or check the input!')
-            # response = chattingBot.get_response(message.text)
-            # bot.send_message(chatid, response)
             return
         else:
-            bot.send_message(chatid,
-                             'Sorry I don\'t understand! Please follow the instruction above or check the input!')
-
-            # response = chattingBot.get_response(message.text)
-            # bot.send_message(chatid, response)
+            bot.send_message(chatid,'Sorry I don\'t understand! Please follow the instruction above or check the input!')
             return
-    except (AttributeError, EOFError,IndexError):
-        bot.send_message(chatid, 'Sorry I don\'t understand! Please follow the instruction above or check the input!'
-                                 '\n\nTo restart the chat bot please use command \'/restart\'\nJust want to chat? Try command \'/chat\'! ')
+    except (AttributeError, EOFError, IndexError) as e:
+        print(e)
+        bot.send_message(chatid, 'Sorry I don\'t understand! '
+                                 'Please follow the instruction above or check the input!'
+                                 '\n\nTo restart the chat bot please use command '
+                                 '\'/restart\'.\nJust want to chat? Try command \'/chat\'! ')
         return
 
 
-@bot.message_handler(content_types=['text'])
-def greating(message):
-    bot.send_message(message.chat.id, '%s!'% message.text)
-    send_welcome(message)
+def search_Time(text):
+    period = text[len(text) - 4:len(text) - 2]
+    tt = str(int(period) + 1)
+    periodSearch = '%sth century' % (tt)
+    return ut.search_wiki(periodSearch)
 
 
-if __name__ == '__main__':
-    time = datetime.datetime.now()
-    #    print Exception
-    print("Bot started: " + str(time))
-    #bot.set_update_listener(get_input)
-    while True:
-        bot.polling(none_stop=True)
-        time.sleep(0.5)
+def get_user_cache(userid, key):
+    global logPath
+    with open(logPath, "rt", encoding='utf-8') as log:
+        reader = csv.DictReader(log)
+        for row in reader:
+            if row['userID'] == userid:
+                return row[key]
+
+
+def write_user_cache(userid, key, value):
+    global logPath,fieldnames
+    csvdict = csv.DictReader(open(logPath))
+    dictrow = []
+    for row in csvdict:
+        if row['userID'] == userid:
+            row[key] = value
+        dictrow.append(row)
+
+    with open(logPath, "w+", encoding='utf-8', newline='') as lloo:
+        wrier = csv.DictWriter(lloo, fieldnames)
+        wrier.writeheader()
+        for wowow in dictrow:
+            wrier.writerow(wowow)
+
+
+with open(logPath, 'w', newline='') as csvfile:
+    spamwriter = csv.writer(csvfile)
+    spamwriter.writerow(fieldnames )
+time = datetime.datetime.now()
+print("Bot started: " + str(time))
+
+# bot.set_update_listener(get_input)
+while True:
+    bot.polling(none_stop=True)
+    time.sleep(0.5)
