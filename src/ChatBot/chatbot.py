@@ -62,7 +62,12 @@ def get_from_data(command, rootAll, rootGene):
 @bot.message_handler(commands=['chat', 'endChat'])
 def chatter_command(message):
     userid = str(message.from_user.id)
-    init(userid)
+    with open(logPath, "rt", encoding='utf-8') as log:
+        reader = csv.DictReader(log)
+        userList = [row['userID'] for row in reader]
+    userid = str(message.from_user.id)
+    if userid not in userList:
+        initCache(userid)
     if message.text.upper() == '/ENDCHAT':
         write_user_cache(userid, 'chatting', 'False')
         bot.reply_to(message, 'End chatting. See ya!')
@@ -79,7 +84,6 @@ def send_welcome(message):
     bot.send_message(message.chat.id, 'Step:%s\nArtist:%s\nStyle:%s' % (get_user_cache(userid, 'knowInfo'),
                                                                         get_user_cache(userid, 'artist'),
                                                                         get_user_cache(userid, 'style')))
-
 
 @bot.message_handler(commands=['start', 'help', 'restart'])
 def send_welcome(message):
@@ -249,13 +253,23 @@ def write_user_cache(userid, key, value):
     for row in csvdict:
         if row['userID'] == userid:
             row[key] = value
+        # rowcache.update(row)
         dictrow.append(row)
 
     with open(logPath, "w+", encoding='utf-8', newline='') as lloo:
+        # lloo.write(new_a_buf.getvalue())
         wrier = csv.DictWriter(lloo, fieldnames)
         wrier.writeheader()
         for wowow in dictrow:
             wrier.writerow(wowow)
+
+
+def initCache(userid):
+    global logPath
+    with open(logPath, "a+", encoding='utf-8') as log:
+        writer = csv.writer(log)
+        writer.writerow([userid, '0', '', '', '', 'False'])
+
 
 
 with open(logPath, 'w', newline='') as csvfile:
@@ -263,8 +277,6 @@ with open(logPath, 'w', newline='') as csvfile:
     spamwriter.writerow(fieldnames )
 time = datetime.datetime.now()
 print("Bot started: " + str(time))
-
-# bot.set_update_listener(get_input)
 while True:
     bot.polling(none_stop=True)
     time.sleep(0.5)

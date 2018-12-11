@@ -1,5 +1,5 @@
 # HeyDr.Jo
-the understand art chatbot
+The understand art chatbot
 
 In DataSearch are the utilities of the searching, analyzing and connecting method.
 
