@@ -10,10 +10,10 @@ from chatterbot import ChatBot
 
 import csv
 
-token = '706415631:AAG1Y6sfLmvxU_TENOaVwGA3hzXdaGJiaWo'
+token = '703120726:AAHrVpXPG-z0omcSTqSC0Q8Ze5tGBIFXM-o'#'706415631:AAG1Y6sfLmvxU_TENOaVwGA3hzXdaGJiaWo'
 pathOfPhoto = 'C:/Users\linuk\Desktop\Staedel\Abbildungen/compressed/'
 pathOfDataset = 'C:/Users\linuk\Desktop\Staedel/Objekte.xml'
-pathOfGene = 'D:\Workspace_Pycharm\HeyDr.Jo\src\ChatBot\generatedDataSet.xml'
+pathOfGene = 'generatedDataSet.xml'
 tree = etree.parse(pathOfDataset)
 root = tree.getroot()
 treeGene = etree.parse(pathOfGene)
@@ -25,7 +25,7 @@ logPath = 'userCache.csv'
 fieldnames = ['userID', 'knowInfo', 'artist', 'style', 'period', 'chatting']
 
 chattingBot = ChatBot("Training Example",
-                      read_only=True,
+                      read_only=False,
                       storage_adapter="chatterbot.storage.SQLStorageAdapter",
                       logic_adapters=[
                           {'import_path': 'chatterbot.logic.MathematicalEvaluation'
@@ -147,27 +147,30 @@ def get_input(message):
             chatid = message.chat.id
             bot.send_message(chatid, ut.search_artist_xml(get_user_cache(userid, 'artist'), rootGene))
             write_user_cache(userid=userid,key='knowInfo',value='2')
-            bot.send_message(chatid, u'\n\n\nDo you want to know more Information?\n\n[Yes or No]')
+            bot.send_message(chatid, '\n\n\nDo you want to know more Information?\n\n[<b>Yes</b> or <b>No</b>]',
+                             parse_mode='HTML')
             return
         elif message.text.upper() == "STYLE" and get_user_cache(userid, 'knowInfo') == '3':
             chatid = message.chat.id
             bot.send_message(chatid, ut.search_style_xml(get_user_cache(userid, 'style'), rootGene))
             write_user_cache(userid=userid,key='knowInfo',value='2')
-            bot.send_message(chatid, u'\n\n\nDo you want to know more information?\n\n[Yes or No]')
+            bot.send_message(chatid, '\n\n\nDo you want to know more Information?\n\n[<b>Yes</b> or <b>No</b>]',
+                             parse_mode='HTML')
             return
 
         elif message.text.upper() == "TIME" and get_user_cache(userid, 'knowInfo') == '3':
             chatid = message.chat.id
             bot.send_message(chatid, search_Time(get_user_cache(userid, 'period')))
             write_user_cache(userid=userid,key='knowInfo',value='2')
-            bot.send_message(chatid, u'\n\n\nDo you want to know more information?\n\n[Yes or No]')
+            bot.send_message(chatid, '\n\n\nDo you want to know more Information?\n\n[<b>Yes</b> or <b>No</b>]',
+                             parse_mode='HTML')
             return
 
         elif message.text.upper() == "RELATED OBJECTS" and get_user_cache(userid, 'knowInfo') == '3':
             chatid = message.chat.id
             bot.send_message(chatid, u'still working, Coming Soon...')
             write_user_cache(userid=userid,key='knowInfo',value='2')
-            bot.send_message(chatid, u'\n\n\nDo you want to know more Information?\n\n[<b>Yes</b> or <b>No</b>]',
+            bot.send_message(chatid, '\n\n\nDo you want to know more Information?\n\n[<b>Yes</b> or <b>No</b>]',
                              parse_mode='HTML')
             return
 
@@ -216,10 +219,16 @@ def get_input(message):
                 message.text.upper() != "ARTIST" and message.text.upper() != "STYLE" and message.text.upper() != "RELATED OBJECTS") \
                 and get_user_cache(userid, 'knowInfo') != '3' and len(message.text) > 4:
             bot.send_message(chatid,
-                             'Sorry I don\'t understand! Please follow the instruction above or check the input!')
+                             'Sorry I don\'t understand! '
+                                 'Please follow the instruction above or check the input!'
+                                 '\n\nTo restart the chat bot please use command '
+                                 '\'/restart\'.\nJust want to chat? Try command \'/chat\'! ')
             return
         else:
-            bot.send_message(chatid,'Sorry I don\'t understand! Please follow the instruction above or check the input!')
+            bot.send_message(chatid,'Sorry I don\'t understand! '
+                                 'Please follow the instruction above or check the input!'
+                                 '\n\nTo restart the chat bot please use command '
+                                 '\'/restart\'.\nJust want to chat? Try command \'/chat\'! ')
             return
     except (AttributeError, EOFError, IndexError) as e:
         print(e)
@@ -278,5 +287,8 @@ with open(logPath, 'w', newline='') as csvfile:
 time = datetime.datetime.now()
 print("Bot started: " + str(time))
 while True:
-    bot.polling(none_stop=True)
-    time.sleep(0.5)
+    try:
+        bot.polling(none_stop=True)
+        time.sleep(0.5)
+    except (OSError ) as e:
+        print(e)
