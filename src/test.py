@@ -10,7 +10,7 @@ import time
 # print(ut.search_wiki('canvas'))
 # #Give the path of the dataset
 # pretime = time.time()
-pathOfDataset = 'C:/Users\linuk\Downloads\Staedel_Teilset/Objekte.xml'
+pathOfDataset = 'C:/Users\linuk\Desktop\Staedel/Objekte.xml'
 #pathOfGene = 'generatedDataSet.xml'
 tree = etree.parse(pathOfDataset)
 root = tree.getroot()

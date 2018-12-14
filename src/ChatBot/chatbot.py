@@ -10,10 +10,10 @@ from chatterbot import ChatBot
 
 import csv
 
-token = '706415631:AAG1Y6sfLmvxU_TENOaVwGA3hzXdaGJiaWo'
+token = '703120726:AAHrVpXPG-z0omcSTqSC0Q8Ze5tGBIFXM-o'#'706415631:AAG1Y6sfLmvxU_TENOaVwGA3hzXdaGJiaWo'
 pathOfPhoto = 'C:/Users\linuk\Desktop\Staedel\Abbildungen/compressed/'
 pathOfDataset = 'C:/Users\linuk\Desktop\Staedel/Objekte.xml'
-pathOfGene = 'D:\Workspace_Pycharm\HeyDr.Jo\src\ChatBot\generatedDataSet.xml'
+pathOfGene = 'generatedDataSet.xml'
 tree = etree.parse(pathOfDataset)
 root = tree.getroot()
 treeGene = etree.parse(pathOfGene)
@@ -25,7 +25,7 @@ logPath = 'userCache.csv'
 fieldnames = ['userID', 'knowInfo', 'artist', 'style', 'period', 'chatting']
 
 chattingBot = ChatBot("Training Example",
-                      read_only=True,
+                      read_only=False,
                       storage_adapter="chatterbot.storage.SQLStorageAdapter",
                       logic_adapters=[
                           {'import_path': 'chatterbot.logic.MathematicalEvaluation'
@@ -62,7 +62,12 @@ def get_from_data(command, rootAll, rootGene):
 @bot.message_handler(commands=['chat', 'endChat'])
 def chatter_command(message):
     userid = str(message.from_user.id)
-    init(userid)
+    with open(logPath, "rt", encoding='utf-8') as log:
+        reader = csv.DictReader(log)
+        userList = [row['userID'] for row in reader]
+    userid = str(message.from_user.id)
+    if userid not in userList:
+        initCache(userid)
     if message.text.upper() == '/ENDCHAT':
         write_user_cache(userid, 'chatting', 'False')
         bot.reply_to(message, 'End chatting. See ya!')
@@ -79,7 +84,6 @@ def send_welcome(message):
     bot.send_message(message.chat.id, 'Step:%s\nArtist:%s\nStyle:%s' % (get_user_cache(userid, 'knowInfo'),
                                                                         get_user_cache(userid, 'artist'),
                                                                         get_user_cache(userid, 'style')))
-
 
 @bot.message_handler(commands=['start', 'help', 'restart'])
 def send_welcome(message):
@@ -143,27 +147,30 @@ def get_input(message):
             chatid = message.chat.id
             bot.send_message(chatid, ut.search_artist_xml(get_user_cache(userid, 'artist'), rootGene))
             write_user_cache(userid=userid,key='knowInfo',value='2')
-            bot.send_message(chatid, u'\n\n\nDo you want to know more Information?\n\n[Yes or No]')
+            bot.send_message(chatid, '\n\n\nDo you want to know more Information?\n\n[<b>Yes</b> or <b>No</b>]',
+                             parse_mode='HTML')
             return
         elif message.text.upper() == "STYLE" and get_user_cache(userid, 'knowInfo') == '3':
             chatid = message.chat.id
             bot.send_message(chatid, ut.search_style_xml(get_user_cache(userid, 'style'), rootGene))
             write_user_cache(userid=userid,key='knowInfo',value='2')
-            bot.send_message(chatid, u'\n\n\nDo you want to know more information?\n\n[Yes or No]')
+            bot.send_message(chatid, '\n\n\nDo you want to know more Information?\n\n[<b>Yes</b> or <b>No</b>]',
+                             parse_mode='HTML')
             return
 
         elif message.text.upper() == "TIME" and get_user_cache(userid, 'knowInfo') == '3':
             chatid = message.chat.id
             bot.send_message(chatid, search_Time(get_user_cache(userid, 'period')))
             write_user_cache(userid=userid,key='knowInfo',value='2')
-            bot.send_message(chatid, u'\n\n\nDo you want to know more information?\n\n[Yes or No]')
+            bot.send_message(chatid, '\n\n\nDo you want to know more Information?\n\n[<b>Yes</b> or <b>No</b>]',
+                             parse_mode='HTML')
             return
 
         elif message.text.upper() == "RELATED OBJECTS" and get_user_cache(userid, 'knowInfo') == '3':
             chatid = message.chat.id
             bot.send_message(chatid, u'still working, Coming Soon...')
             write_user_cache(userid=userid,key='knowInfo',value='2')
-            bot.send_message(chatid, u'\n\n\nDo you want to know more Information?\n\n[<b>Yes</b> or <b>No</b>]',
+            bot.send_message(chatid, '\n\n\nDo you want to know more Information?\n\n[<b>Yes</b> or <b>No</b>]',
                              parse_mode='HTML')
             return
 
@@ -212,10 +219,16 @@ def get_input(message):
                 message.text.upper() != "ARTIST" and message.text.upper() != "STYLE" and message.text.upper() != "RELATED OBJECTS") \
                 and get_user_cache(userid, 'knowInfo') != '3' and len(message.text) > 4:
             bot.send_message(chatid,
-                             'Sorry I don\'t understand! Please follow the instruction above or check the input!')
+                             'Sorry I don\'t understand! '
+                                 'Please follow the instruction above or check the input!'
+                                 '\n\nTo restart the chat bot please use command '
+                                 '\'/restart\'.\nJust want to chat? Try command \'/chat\'! ')
             return
         else:
-            bot.send_message(chatid,'Sorry I don\'t understand! Please follow the instruction above or check the input!')
+            bot.send_message(chatid,'Sorry I don\'t understand! '
+                                 'Please follow the instruction above or check the input!'
+                                 '\n\nTo restart the chat bot please use command '
+                                 '\'/restart\'.\nJust want to chat? Try command \'/chat\'! ')
             return
     except (AttributeError, EOFError, IndexError) as e:
         print(e)
@@ -249,13 +262,23 @@ def write_user_cache(userid, key, value):
     for row in csvdict:
         if row['userID'] == userid:
             row[key] = value
+        # rowcache.update(row)
         dictrow.append(row)
 
     with open(logPath, "w+", encoding='utf-8', newline='') as lloo:
+        # lloo.write(new_a_buf.getvalue())
         wrier = csv.DictWriter(lloo, fieldnames)
         wrier.writeheader()
         for wowow in dictrow:
             wrier.writerow(wowow)
+
+
+def initCache(userid):
+    global logPath
+    with open(logPath, "a+", encoding='utf-8') as log:
+        writer = csv.writer(log)
+        writer.writerow([userid, '0', '', '', '', 'False'])
+
 
 
 with open(logPath, 'w', newline='') as csvfile:
@@ -263,8 +286,9 @@ with open(logPath, 'w', newline='') as csvfile:
     spamwriter.writerow(fieldnames )
 time = datetime.datetime.now()
 print("Bot started: " + str(time))
-
-# bot.set_update_listener(get_input)
 while True:
-    bot.polling(none_stop=True)
-    time.sleep(0.5)
+    try:
+        bot.polling(none_stop=True)
+        time.sleep(0.5)
+    except (OSError ) as e:
+        print(e)

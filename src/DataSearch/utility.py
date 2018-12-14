@@ -29,14 +29,15 @@ def get_start_info(ref, root):
     """
 
     record = None
-    if len(ref)<= 5:
-        ref = ref.replace('_',' ')
-        refnumberlist = root.getiterator('object_number')
-        for refnumber in refnumberlist:
-            if refnumber.text == ref.upper():
-                record = refnumber.getparent()
-                break
-    else:
+    ref = ref.replace('_',' ')
+    refnumberlist = root.getiterator('object_number')
+    for refnumber in refnumberlist:
+        if refnumber.text.upper() == ref.upper():
+            record = refnumber.getparent()
+            if record.tag != 'record':
+                continue
+            break
+    if record == None:
         titleList = root.getiterator('Title')
         pattern = '(%s).*'%(ref)
         for bigtitle in titleList:
@@ -48,9 +49,10 @@ def get_start_info(ref, root):
     ref = record.find('object_number')
     refnumber = ref.text.replace(' ','_')
     ###Title######
-    title = record.find('.//Title')
+    title = record.find('Title')
     tt = title.find('.//title')
     titlestr = tt.text
+
     ###artist#####
     creator = record.find('.//Creator')
     name = creator.find('.//name')
@@ -95,6 +97,7 @@ def get_details(record):
         dimension = ''
     ##style##
     style = get_text_value(record,'.//school_style')
+
     ###technik##
     technik = get_text_value(record,'.//technique')
     ####Art
@@ -107,6 +110,11 @@ def get_details(record):
     dict['technik'] = technik
     dict['art'] = art
     dict['artist'] = artist
+    if style =='Nothing':
+        detail_Info = 'The \'%s\' is a %s %s created by %s.%s' % (
+        titlestr, technik, art,  artist, dimension)
+        dict['style'] = ''
+        return detail_Info, dict
     detail_Info = 'The \'%s\' is a %s %s in style %s created by %s.%s'%(titlestr, technik, art, style, artist,dimension)
     return detail_Info,dict
 
@@ -235,6 +243,8 @@ def search_style_xml(name,root):
         description ::str
 
         """
+    if name == '':
+        return 'Can\'t find any information....'
     artistList = root.getiterator('style')
     for artist in artistList:
         if artist.attrib['stylename'] == name :
