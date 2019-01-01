@@ -11,8 +11,8 @@ from chatterbot import ChatBot
 import csv
 
 token = '703120726:AAHrVpXPG-z0omcSTqSC0Q8Ze5tGBIFXM-o'#'706415631:AAG1Y6sfLmvxU_TENOaVwGA3hzXdaGJiaWo'
-pathOfPhoto = 'C:/Users\linuk\Desktop\Staedel\Abbildungen/compressed/'
-pathOfDataset = 'C:/Users\linuk\Desktop\Staedel/Objekte.xml'
+pathOfPhoto = 'D:\Workspace\Staedel\Abbildung/'
+pathOfDataset = 'D:\Workspace\Staedel/Objekte.xml'
 pathOfGene = 'generatedDataSet.xml'
 tree = etree.parse(pathOfDataset)
 root = tree.getroot()
@@ -141,16 +141,24 @@ def get_input(message):
             bot.send_message(chatid, u'What would you like to know, ' \
                                      'introductions about the artist, time, style or some related objects of this object in our museum?' \
                                      '\n\n[<b>artist,time,style</b>]', parse_mode='HTML')
-            write_user_cache(userid=userid,key='knowInfo',value='3')
+            write_user_cache(userid=userid,key='knowInfo',value='2')
             return
-        elif message.text.upper() == "ARTIST" and get_user_cache(userid, 'knowInfo') == '3':
+        elif "ARTIST" in message.text.upper() and get_user_cache(userid, 'knowInfo') == '2':
             chatid = message.chat.id
-            bot.send_message(chatid, ut.search_artist_xml(get_user_cache(userid, 'artist'), rootGene))
+            artName = get_user_cache(userid, 'artist')
+            bot.send_message(chatid, ut.search_artist_xml(artName, rootGene))
+            try:
+                picname = ut.name_API(artName)
+                photo = open(pathOfPhoto + picname + '.jpg', 'rb')
+                bot.send_message(chatid, u'Sending photo... Please wait')
+                bot.send_photo(chatid, photo,caption=artName)
+            except (FileNotFoundError):
+                print('no photo')
             write_user_cache(userid=userid,key='knowInfo',value='2')
             bot.send_message(chatid, '\n\n\nDo you want to know more Information?\n\n[<b>Yes</b> or <b>No</b>]',
                              parse_mode='HTML')
             return
-        elif message.text.upper() == "STYLE" and get_user_cache(userid, 'knowInfo') == '3':
+        elif "STYLE" in message.text.upper() and get_user_cache(userid, 'knowInfo') == '2':
             chatid = message.chat.id
             bot.send_message(chatid, ut.search_style_xml(get_user_cache(userid, 'style'), rootGene))
             write_user_cache(userid=userid,key='knowInfo',value='2')
@@ -158,7 +166,7 @@ def get_input(message):
                              parse_mode='HTML')
             return
 
-        elif message.text.upper() == "TIME" and get_user_cache(userid, 'knowInfo') == '3':
+        elif "TIME" in message.text.upper() and get_user_cache(userid, 'knowInfo') == '2':
             chatid = message.chat.id
             bot.send_message(chatid, search_Time(get_user_cache(userid, 'period')))
             write_user_cache(userid=userid,key='knowInfo',value='2')
@@ -166,7 +174,7 @@ def get_input(message):
                              parse_mode='HTML')
             return
 
-        elif message.text.upper() == "RELATED OBJECTS" and get_user_cache(userid, 'knowInfo') == '3':
+        elif message.text.upper() == "RELATED OBJECTS" and get_user_cache(userid, 'knowInfo') == '2':
             chatid = message.chat.id
             bot.send_message(chatid, u'still working, Coming Soon...')
             write_user_cache(userid=userid,key='knowInfo',value='2')
@@ -178,8 +186,13 @@ def get_input(message):
             bot.send_message(chatid, u'Please give the number or the name of your interested object!')
             write_user_cache(userid=userid,key='knowInfo',value='0')
             return
-        elif message.text.lower() in __dict__['hello']:
+        elif message.text.lower() in __dict__['hello'] and get_user_cache(userid, 'knowInfo') == '0':
             greating(message)
+            return
+        elif message.text.lower() in __dict__['hello'] and get_user_cache(userid, 'knowInfo') != '0':
+            statment = message.text
+            response = chattingBot.get_response(statment)
+            bot.send_message(chatid, response)
             return
         elif message.text.lower() in __dict__['thanks']:
             n = random.choice(__dict__['you are welcome'])
@@ -246,6 +259,11 @@ def search_Time(text):
     return ut.search_wiki(periodSearch)
 
 
+def search_related(ref):
+    ut.s
+    return False
+
+
 def get_user_cache(userid, key):
     global logPath
     with open(logPath, "rt", encoding='utf-8') as log:
@@ -281,7 +299,7 @@ def initCache(userid):
 
 
 
-with open(logPath, 'w', newline='') as csvfile:
+with open(logPath, 'w', newline='',encoding='utf-8') as csvfile:
     spamwriter = csv.writer(csvfile)
     spamwriter.writerow(fieldnames )
 time = datetime.datetime.now()
