@@ -10,6 +10,19 @@ from xml.dom.minidom import Document
 from json.decoder import JSONDecodeError
 
 
+def search_pic_of_artist(artiName,current,root):
+    relatedlist =[]
+    creatorList=root.getiterator('Creator')
+    for creator in creatorList:
+        if creator.find('./name').text == artiName:
+            recordcache = creator.getparent().getparent()
+            number = recordcache.find('./object_number')
+            if number.text == current:
+                continue
+            relatedlist.append(number.text)
+            if len(relatedlist) >4:
+                return relatedlist
+    return relatedlist
 def get_start_info(ref, root):
     """
     This method will search the title, name of artist and the created year from xml.

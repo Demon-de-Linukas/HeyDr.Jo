@@ -1,4 +1,6 @@
 from chatterbot import ChatBot
+from chatterbot.trainers import ListTrainer
+from chatterbot.conversation import Statement
 from chatterbot.trainers import ChatterBotCorpusTrainer
 
 chatterbot = ChatBot("Training Example",
@@ -12,11 +14,24 @@ chatterbot = ChatBot("Training Example",
                      output_adapter="chatterbot.output.TerminalAdapter",
                      database="../database.db"
                      )
+chatterbot.set_trainer(ListTrainer)
+chatterbot.train([
+    "Who are you",
+    "I am Dr. Jo, a chat bot of Städel Museum :-)",
+    "What can you do?",
+    "Me as a guide in Städel Museum can provide you more information about the art works. "
+    "It can help you know better about the art and the museum. "
+    "You can tell me the reference number of pictures or title of pictures, and I will tell you "
+    "more about the art work! "
+    "\nTo start visiting meseum please enter /visit."
+    "\nTo chat with me please use command /chat. "
+    "\nTo restart the chat bot please use command /restart."
+])
 chatterbot.set_trainer(ChatterBotCorpusTrainer)
-#
-# chatterbot.train(
-#     "chatterbot.corpus.english"
-# )
+
+chatterbot.train(
+    "chatterbot.corpus.english"
+)
 
 print("Type something to begin...")
 

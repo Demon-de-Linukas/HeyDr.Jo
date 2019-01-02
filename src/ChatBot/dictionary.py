@@ -1,6 +1,6 @@
 
 dict = {}
-dict['yes'] = ['yes', 'ja', 'ok', 'ye', 'okay', 'jo', 'yo', 'sure']
+dict['yes'] = ['yes', 'ja', 'ok', 'ye', 'okay', 'jo', 'yo', 'sure', 'yes, please', 'yes,please', 'y']
 dict["no"]=['no', 'nope', 'I don\'t think so']
 dict['hello']=['hi', 'hello', 'hallo', 'good day','hi!', 'hello!', 'hallo!', 'good day!']
 dict['thanks']=['thanks', 'thank you', 'i appreciate it', 'that\'s nice of you', 'thx']
