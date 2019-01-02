@@ -3,6 +3,9 @@ from lxml import etree
 import time
 import requests
 import re
+import json
+from bs4 import BeautifulSoup
+
 from xml.dom.minidom import Document
 from json.decoder import JSONDecodeError
 
@@ -347,3 +350,75 @@ def create_style_tree(listSum,fpath,outpath):
         descrip.text = listSum[1][i]
     root.append(all_style)
     tree.write(outpath, encoding="utf-8",xml_declaration=True)
+
+
+def search_img(namestr):
+    """
+    Get the description from Wikimedia
+    Parameters
+    ----------
+    namestr ::
+        str name string from xml data set
+    Returns
+    -------
+    description ::str
+    """
+    APIname = name_API(namestr)
+    nPos = namestr.index(',')
+    nachname = namestr[0:nPos]
+    S = requests.Session()
+    URL = "https://de.wikipedia.org/w/api.php"
+    mediaURL = 'https://de.wikipedia.org/wiki/%s#/media/'% (APIname)
+
+    PARAMS = {
+        'action': 'query',
+        'format': 'json',
+        'prop': 'images',
+        'titles': APIname
+    }
+
+    saveAdres = 'D:\Workspace\HeyDr.Jo\src\DataSearch\d/%s.jpg'%(APIname)
+
+    datas= S.get(url=URL, params=PARAMS)
+    datas.encoding = ';utf-8'
+    jData = json.loads(datas.text)
+    print(jData)
+
+    pages =jData['query']['pages']
+    for ii in pages:
+        id = pages[ii]
+        images = id['images']
+        for srcImg in images:
+            src = srcImg['title']
+            if '.jpg' not in src:
+                continue
+            if ('selbst' in src.lower()) or ('porträt' in src.lower()) or ('self' in src.lower()):
+                res= mediaURL+src
+                resUrl = res.replace(' ', '_')
+                print(resUrl)
+                resPage = requests.get(resUrl)
+                downPage = re.findall(r'https://upload.*?jpg\"', resPage.text)
+                downUrl = downPage[0][0:(len(downPage[0])-1)]
+                tryimg = requests.get(downUrl)
+                print(downPage[0])
+                with open(saveAdres, 'a+') as f:
+                    f.write(tryimg.content)
+                    return f
+        for srcImg in images:
+            src = srcImg['title']
+            if '.jpg' not in src:
+                continue
+            if nachname.lower() in src.lower():
+                res = mediaURL + src
+                resUrl = res.replace(' ', '_')
+                print(resUrl)
+                resPage = requests.get(resUrl)
+                downPage = re.findall(r'https://upload.*?jpg\"', resPage.text)
+                downUrl = downPage[0][0:(len(downPage[0]) - 1)]
+                tryimg = requests.get(downUrl)
+                print(downPage[0])
+                with open(saveAdres, 'a+') as f:
+                    f.write(tryimg.content)
+                    return f
+
+
