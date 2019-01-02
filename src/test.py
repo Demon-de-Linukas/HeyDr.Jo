@@ -3,24 +3,27 @@
 
 import xml.etree.ElementTree as et
 from lxml import etree
-from src.DataSearch import utility as ut
+from DataSearch import utility as ut
 import time
 
 #
 # print(ut.search_wiki('canvas'))
 # #Give the path of the dataset
 # pretime = time.time()
-#pathOfDataset = 'C:/Users\linuk\Downloads\Staedel_Teilset/Objekte.xml'
-pathOfDataset = 'generatedDataSet.xml'
+pathOfDataset = 'D:\Workspace\Staedel/Objekte.xml'
+#pathOfDataset = 'generatedDataSet.xml'
 tree = etree.parse(pathOfDataset)
 root = tree.getroot()
-artistList = root.getiterator('Artist')
-for artist in artistList:
-    try:
-        sth = ut.search_img(artist.attrib['name'])
-    except (KeyError,ValueError,IndexError) as e:
-        print(e)
-
+list = ut.search_pic_of_artist('Schütz d. Ä., Christian Georg','18',root)
+for ll in list:
+    print(ll)
+# artistList = root.getiterator('Artist')
+# for artist in artistList:
+#     try:
+#         sth = ut.search_img(artist.attrib['name'])
+#     except (KeyError,ValueError,IndexError) as e:
+#         print(e)
+#
 
 #
 
