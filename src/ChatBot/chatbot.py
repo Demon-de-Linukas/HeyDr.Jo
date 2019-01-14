@@ -1,6 +1,7 @@
 import datetime
 import telebot as tb
 import random
+import re
 import pandas as pd
 
 from lxml import etree
@@ -11,10 +12,11 @@ from chatterbot import ChatBot
 import csv
 
 token = '703120726:AAHrVpXPG-z0omcSTqSC0Q8Ze5tGBIFXM-o'#'706415631:AAG1Y6sfLmvxU_TENOaVwGA3hzXdaGJiaWo'
-pathOfPhoto = 'D:\Workspace\Staedel\Abbildung/'
-pathOfDataset = 'D:\Workspace\Staedel/Objekte.xml'
+pathOfPhoto = 'C:/Users\linuk\Desktop\Staedel\Abbildung/compressed/'
+pathOfDataset = 'C:/Users\linuk\Desktop\Staedel/Objekte.xml'
 pathOfGene = 'generatedDataSet.xml'
-tree = etree.parse(pathOfDataset)
+papapa = etree.XMLParser(encoding="utf-8")
+tree = etree.parse(pathOfDataset, parser=papapa)
 root = tree.getroot()
 treeGene = etree.parse(pathOfGene)
 rootGene = treeGene.getroot()
@@ -23,7 +25,7 @@ bot = tb.TeleBot(token)
 
 logPath = 'userCache.csv'
 fieldnames = ['userID', 'knowInfo', 'artist', 'refnumber', 'style', 'period', 'chatting']
-processDict = ['yes', 'no', 'artist', 'style', 'time', 'periode', 'related']
+processDict = ['yes', 'no', 'artist', 'style', 'time', 'periode', 'related','hi', 'hello', 'hallo', 'good day','hi!', 'hello!', 'hallo!', 'good day!']
 
 chattingBot = ChatBot("Training Example",
                       read_only=False,
@@ -35,7 +37,15 @@ chattingBot = ChatBot("Training Example",
                            },
                           {'import_path': 'chatterbot.logic.SpecificResponseAdapter',
                            'input_text': 'Who are you',
-                           'output_text': 'I am Dr. Jo, a chat bot of Städel Museum :-)'}
+                           'output_text': 'I am Dr. Jo, a chat bot of Städel Museum :-)'},
+                          {'import_path': 'chatterbot.logic.LowConfidenceAdapter',
+                            'threshold': 0.65,
+                            'default_response': 'I am sorry, but I do not understand.'},
+                          {
+                            "import_path": "chatterbot.logic.BestMatch",
+                            "statement_comparison_function": "chatterbot.comparisons.levenshtein_distance",
+                            "response_selection_method": "chatterbot.response_selection.get_first_response"
+                          }
                       ],
                       database="../database.db"
                       )
@@ -133,6 +143,7 @@ def greating(message):
 
                                       "[<b>Ref. number</b> or <b>Title</b> of object]", parse_mode='HTML')
     write_user_cache(userid, 'knowInfo', '1')
+    write_user_cache(userid, 'chatting', 'False')
 
 
 @bot.message_handler(content_types='text')
@@ -154,22 +165,23 @@ def get_input(message):
         period = get_user_cache(userid, 'period')
     except (AttributeError):
         print('Creating new user cache...')
+        initCache(userid)
 
     try:
         chatid = message.chat.id
         for checkWrd in processDict:
-            if checkWrd in message.text.lower() or is_number(message.text) or get_user_cache(userid, 'knowInfo') == '1':
+            if checkWrd in message.text.lower() or bool(re.search(r'\d', message.text)) or get_user_cache(userid, 'knowInfo') in ['1','2']:
                 write_user_cache(userid, 'chatting', 'False')
                 break
-            else:
-                write_user_cache(userid, 'chatting', 'True')
+        else:
+            write_user_cache(userid, 'chatting', 'True')
 
         if 'ho are you' in message.text:
             statment = 'Who are you'
             response = chattingBot.get_response(statment)
             bot.send_message(chatid, response)
             return
-        elif message.text.lower() in __dict__['hello'] and get_user_cache(userid, 'knowInfo') != '0':
+        elif message.text.lower() in __dict__['hello']:
             greating(message)
             return
         elif get_user_cache(userid, 'chatting')=='True':
@@ -178,29 +190,41 @@ def get_input(message):
             bot.send_message(chatid, response)
             return
         elif message.text.lower() in __dict__['yes'] and get_user_cache(userid, 'knowInfo') == '2':
-            chatid = message.chat.id
             bot.send_message(chatid, u'What would you like to know, '
                                      'introductions about the artist, time, '
                                      'style or some related objects of this object in our museum?'
-                                     '\n\n[<b>artist,time,style</b>]', parse_mode='HTML')
-            write_user_cache(userid=userid,key='knowInfo',value='2')
+                                     '\n\n[<b>artist,time,style</b> or <b>related object</b>] ', parse_mode='HTML')
             return
         elif message.text.lower() in __dict__['yes'] and get_user_cache(userid, 'knowInfo') == '3':
-            chatid = message.chat.id
             artist = get_user_cache(userid, 'artist')
             curent = get_user_cache(userid, 'refnumber')
             piclist = ut.search_pic_of_artist(artist,curent,root)
-            for pic in piclist:
+            sent = 0
+            if len(piclist)==0:
+                bot.send_message(chatid,
+                                 'Sorry, but i can\'t find any more in our Museum....\n\nWhat would you like to know, '
+                                 'the <b>related object</b>, <b>time</b> or <b>style</b>.'
+                                 , parse_mode='HTML')
+            else:
                 try:
-                    photo = open(pathOfPhoto + pic + '.png', 'rb')
-                    bot.send_message(chatid, u'Sending photo... Please wait')
-                    bot.send_photo(chatid, photo, caption='Reference number: %s'%(pic))
+                    for pic in piclist:
+                        photo = open(pathOfPhoto + pic + '.png', 'rb')
+                        bot.send_message(chatid, u'Sending photo... Please wait')
+                        bot.send_photo(chatid, photo, caption='Reference number: %s'%(pic))
+                        sent = 1
+
                 except (FileNotFoundError):
-                    print('no photo')
-            bot.send_message(chatid, u'What would you like to know, '
-                                     'introductions about the artist, time, '
-                                     'style or some related objects of this object in our museum?'
-                                     '\n\n[<b>artist,time,style</b>]', parse_mode='HTML')
+                    print ('No photo')
+                if sent == 1:
+                    bot.send_message(chatid, 'Those are what I get. Are you intrested in any of them? '
+                                             'Please give the reference number!'
+                                             'Or I can also introduce you more about the artist, time or style.'
+                                             '', parse_mode='HTML')
+                elif sent == 0:
+                    bot.send_message(chatid, 'Sorry, but i can\'t find any more in our Museum....\n\nWhat would you like to know, '
+                                                 'the <b>related object</b>, <b>time</b> or <b>style</b>.'
+                                                 , parse_mode='HTML')
+
             write_user_cache(userid=userid,key='knowInfo',value='2')
             return
         elif "ARTIST" in message.text.upper() and get_user_cache(userid, 'knowInfo') == '2':
@@ -234,15 +258,43 @@ def get_input(message):
                              parse_mode='HTML')
             return
 
-        elif message.text.upper() == "RELATED OBJECTS" and get_user_cache(userid, 'knowInfo') == '2':
-            chatid = message.chat.id
-            bot.send_message(chatid, u'still working, Coming Soon...')
+        elif "RELATED" in message.text.upper() and get_user_cache(userid, 'knowInfo') == '2':
+            curent = get_user_cache(userid, 'refnumber')
+            relalist = ut.search_related(curent,root)
+            i = 0
+            sent = 0
+            if len(relalist) == 0:
+                bot.send_message(chatid, 'Sorry, but i can\'t find any more in our Museum....\n\nWhat would you like to know, '
+                                             'the artist, time, '
+                                           'style or some related objects of this picture?')
+            else:
+                for ll in range(len(relalist)):
+                    try:
+                        pic = random.choice(relalist)
+                        relalist.remove(pic)
+                        photo = open(pathOfPhoto + pic + '.png', 'rb')
+                        bot.send_message(chatid, u'Sending photo... Please wait')
+                        bot.send_photo(chatid, photo, caption='Reference number: %s' % (pic))
+                        sent +=1
+                        i += 1
+                    except (FileNotFoundError):
+                        print('not found')
+                    if i>3:
+                        break
+                if sent == 0:
+                    bot.send_message(chatid,
+                                     'Sorry, but i can\'t find any more in our Museum....\n\nWhat would you like to know, '
+                                     'the artist, time, '
+                                     'style or some related objects of this picture?')
+                else:
+                    bot.send_message(chatid, 'Those are what I get. Are you intrested in any of them? '
+                                             'Please give the reference number!'
+                                             'Or I can also introduce you more about the <b>artist</b>, <b>time</b> or <b>style</b>.'
+                                             , parse_mode='HTML')
             write_user_cache(userid=userid,key='knowInfo',value='2')
-            bot.send_message(chatid, '\n\n\nDo you want to know more Information?',
-                             parse_mode='HTML')
             return
 
-        elif message.text.upper() == 'NO':
+        elif 'NO' in message.text.upper():
             bot.send_message(chatid, u'Please give the number or the name of your interested object!')
             write_user_cache(userid=userid,key='knowInfo',value='1')
             return
@@ -255,7 +307,7 @@ def get_input(message):
             m = random.choice(__dict__['bye'])
             bot.send_message(chatid, m)
 
-        elif get_user_cache(userid, 'knowInfo') == '1' or get_user_cache(userid, 'knowInfo') == '0':
+        elif bool(re.search(r'\d', message.text)) and get_user_cache(userid, 'knowInfo') in ['0','1','2']:
             print(get_user_cache(userid, 'knowInfo'))
             # for message in messageList:
             title, artist, period, refnum, record = ut.get_start_info(message.text, root)
@@ -278,7 +330,7 @@ def get_input(message):
             except (FileNotFoundError):
                 print('no photo')
             bot.send_message(chatid,
-                             u'Should I introduce more information about the artist or style of this object?\n\n[<b>Yes</b> or <b>No</b>]',
+                             u'Should I introduce more information about this object?',
                              parse_mode='HTML')
             write_user_cache(userid=userid,key='knowInfo',value='2')
             return
