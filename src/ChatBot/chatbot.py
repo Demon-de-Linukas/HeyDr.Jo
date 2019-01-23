@@ -2,7 +2,6 @@ import datetime
 import telebot as tb
 import random
 import re
-import pandas as pd
 import requests
 import urllib3
 import socket
