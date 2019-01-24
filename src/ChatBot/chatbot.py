@@ -193,9 +193,7 @@ def get_input(message):
             return
         elif (message.text.lower() in __dict__['yes'] and get_user_cache(userid, 'knowInfo') == '2') \
                 or (message.text.lower() in __dict__['no'] and get_user_cache(userid, 'knowInfo') == '3'):
-            bot.send_message(chatid, u'What would you like to know, '
-                                     'introductions about the artist, time, '
-                                     'style or some related objects of this object in our museum?'
+            bot.send_message(chatid, u'Tell me, about what exactly you would like to know more, so I don\'t bore you!'
                                      '\n\n[<b>artist,time,style</b> or <b>related object</b>] ', parse_mode='HTML')
             write_user_cache(userid=userid,key='knowInfo',value='2')
             return
@@ -220,9 +218,10 @@ def get_input(message):
                 except (FileNotFoundError):
                     print ('No photo')
                 if sent == 1:
-                    bot.send_message(chatid, 'Those are what I get. \n\nAre you intrested in any of them? '
-                                             'Please give the reference number!\n\n'
-                                             'Or I can also introduce you more about the <b>artist</b>, <b>time</b> or <b>style</b>.'
+                    bot.send_message(chatid, 'These are the related objects. If you want to know more about one, '
+                         'please enter the reference number!'
+                         'Otherwise I can tell you more about the <b>artist</b>, <b>time</b> '
+                         'or <b>style</b> of your current object.''
                                              , parse_mode='HTML')
                 elif sent == 0:
                     bot.send_message(chatid, 'Sorry, I can\'t help with this...\n\n But I can tell you more about: '
@@ -269,8 +268,9 @@ def get_input(message):
             sent = 0
             if len(relalist) == 0:
                 bot.send_message(chatid,
-                                 'Sorry, but i can\'t find any more in our Museum....\n\nWhat would you like to know, '
-                                 'the <b>related object</b>, <b>time</b> or <b>style</b>.'
+                                 'Sorry, I can\'t help with this...\n\n But I can tell you more about: '
+                             'the <b>artist</b>, <b>time</b>, '
+                           '<b>style</b> or <b>related objects</b> of this object?'
                                                  , parse_mode='HTML')
             else:
                 for ll in range(len(relalist)):
@@ -292,15 +292,16 @@ def get_input(message):
                                       'the <b>artist</b>, <b>time</b>, '
                                            '<b>style</b> or <b>related objects</b> of this object?')
                 else:
-                    bot.send_message(chatid, 'Those are what I get. \n\nAre you intrested in any of them? '
-                                             'Please give the reference number!\n\n'
-                                             'Or I can also introduce you more about the <b>artist</b>, <b>time</b> or <b>style</b>.'
+                    bot.send_message(chatid, 'These are the related objects. If you want to know more about one, '
+                         'please enter the reference number!'
+                         'Otherwise I can tell you more about the <b>artist</b>, <b>time</b> '
+                         'or <b>style</b> of your current object.'
                                              , parse_mode='HTML')
             write_user_cache(userid=userid,key='knowInfo',value='2')
             return
 
         elif message.text.lower() in __dict__['no']:
-            bot.send_message(chatid, u'Please give the number or the name of your interested object!')
+            bot.send_message(chatid, u'Please type in the number or name of your object of interest!')
             write_user_cache(userid=userid,key='knowInfo',value='1')
             return
 
