@@ -2,7 +2,9 @@ import datetime
 import telebot as tb
 import random
 import re
-import pandas as pd
+import requests
+import urllib3
+import socket
 
 from lxml import etree
 from DataSearch import utility as ut
@@ -28,13 +30,13 @@ fieldnames = ['userID', 'knowInfo', 'artist', 'refnumber', 'style', 'period', 'c
 processDict = ['yes', 'no', 'artist', 'style', 'time', 'periode', 'related','hi', 'hello', 'hallo', 'good day','hi!', 'hello!', 'hallo!', 'good day!']
 
 chattingBot = ChatBot("Training Example",
-                      read_only=False,
+                      read_only=True,
                       storage_adapter="chatterbot.storage.SQLStorageAdapter",
                       logic_adapters=[
-                          {'import_path': 'chatterbot.logic.MathematicalEvaluation'
-                           },
-                          {'import_path': 'chatterbot.logic.BestMatch'
-                           },
+                          # {'import_path': 'chatterbot.logic.MathematicalEvaluation'
+                          #  },
+                          # {'import_path': 'chatterbot.logic.BestMatch'
+                          #  },
                           {'import_path': 'chatterbot.logic.SpecificResponseAdapter',
                            'input_text': 'Who are you',
                            'output_text': 'I am Dr. Jo, a chat bot of Städel Museum :-)'},
@@ -189,9 +191,13 @@ def get_input(message):
             response = chattingBot.get_response(statment)
             bot.send_message(chatid, response)
             return
-        elif message.text.lower() in __dict__['yes'] and get_user_cache(userid, 'knowInfo') == '2':
-            bot.send_message(chatid, u'Tell me, about what exactly you would like to know more, so I don\'t bore you!'
-                                     '\n\n[<b>artist,time,style</b> or <b>related objects</b>] ', parse_mode='HTML')
+        elif (message.text.lower() in __dict__['yes'] and get_user_cache(userid, 'knowInfo') == '2') \
+                or (message.text.lower() in __dict__['no'] and get_user_cache(userid, 'knowInfo') == '3'):
+            bot.send_message(chatid, u'What would you like to know, '
+                                     'introductions about the artist, time, '
+                                     'style or some related objects of this object in our museum?'
+                                     '\n\n[<b>artist,time,style</b> or <b>related object</b>] ', parse_mode='HTML')
+            write_user_cache(userid=userid,key='knowInfo',value='2')
             return
         elif message.text.lower() in __dict__['yes'] and get_user_cache(userid, 'knowInfo') == '3':
             artist = get_user_cache(userid, 'artist')
@@ -214,11 +220,10 @@ def get_input(message):
                 except (FileNotFoundError):
                     print ('No photo')
                 if sent == 1:
-                    bot.send_message(chatid, 'These are the related objects. If you want to know more about one, '
-                                             'please enter the reference number!'
-                                             'Otherwise I can tell you more about the <b>artist</b>, <b>time</b> '
-                                             'or <b>style</b> of your current object.'
-                                             '', parse_mode='HTML')
+                    bot.send_message(chatid, 'Those are what I get. \n\nAre you intrested in any of them? '
+                                             'Please give the reference number!\n\n'
+                                             'Or I can also introduce you more about the <b>artist</b>, <b>time</b> or <b>style</b>.'
+                                             , parse_mode='HTML')
                 elif sent == 0:
                     bot.send_message(chatid, 'Sorry, I can\'t help with this...\n\n But I can tell you more about: '
                                                  'the <b>related objects</b>, <b>time</b> or <b>style</b>.'
@@ -263,9 +268,10 @@ def get_input(message):
             i = 0
             sent = 0
             if len(relalist) == 0:
-                bot.send_message(chatid, 'Sorry, I can\'t help with this...\n\n But I can tell you more about: '
-                                             'the <b>artist</b>, <b>time</b>, '
-                                           '<b>style</b> or <b>related objects</b> of this object?')
+                bot.send_message(chatid,
+                                 'Sorry, but i can\'t find any more in our Museum....\n\nWhat would you like to know, '
+                                 'the <b>related object</b>, <b>time</b> or <b>style</b>.'
+                                                 , parse_mode='HTML')
             else:
                 for ll in range(len(relalist)):
                     try:
@@ -286,16 +292,15 @@ def get_input(message):
                                       'the <b>artist</b>, <b>time</b>, '
                                            '<b>style</b> or <b>related objects</b> of this object?')
                 else:
-                    bot.send_message(chatid, 'These are the related objects. If you want to know more about one, '
-                                             'please enter the reference number!'
-                                             'Otherwise I can tell you more about the <b>artist</b>, <b>time</b> '
-                                             'or <b>style</b> of your current object.'
+                    bot.send_message(chatid, 'Those are what I get. \n\nAre you intrested in any of them? '
+                                             'Please give the reference number!\n\n'
+                                             'Or I can also introduce you more about the <b>artist</b>, <b>time</b> or <b>style</b>.'
                                              , parse_mode='HTML')
             write_user_cache(userid=userid,key='knowInfo',value='2')
             return
 
-        elif 'NO' in message.text.upper():
-            bot.send_message(chatid, u'Please type in the number or name of your object of interest!')
+        elif message.text.lower() in __dict__['no']:
+            bot.send_message(chatid, u'Please give the number or the name of your interested object!')
             write_user_cache(userid=userid,key='knowInfo',value='1')
             return
 
@@ -356,11 +361,6 @@ def search_Time(text):
     return ut.search_wiki(periodSearch)
 
 
-def search_related(ref):
-    ut.s
-    return False
-
-
 def get_user_cache(userid, key):
     global logPath
     with open(logPath, "rt", encoding='utf-8') as log:
@@ -372,7 +372,7 @@ def get_user_cache(userid, key):
 
 def write_user_cache(userid, key, value):
     global logPath,fieldnames
-    csvdict = csv.DictReader(open(logPath))
+    csvdict = csv.DictReader(open(logPath, 'rt', encoding='utf-8', newline=''))
     dictrow = []
     for row in csvdict:
         if row['userID'] == userid:
@@ -405,5 +405,5 @@ while True:
     try:
         bot.polling(none_stop=True)
         time.sleep(0.5)
-    except (OSError, TimeoutError) as e:
+    except (OSError, TimeoutError,requests.exceptions.ReadTimeout,urllib3.exceptions.ReadTimeoutError,socket.timeout) as e:
         print(e)

@@ -5,4 +5,12 @@ In DataSearch are the utilities of the searching, analyzing and connecting metho
 
 To test the method in utility.py you can use the file test.py
 
-For that purpose lxml is requested, use (pip install lxml) or (conda install lxml) you can download and install it :-)
+For that purpose the package ***lxml***, ***chatterbot*** and ***pyTelegramBotAPI*** is requested, use 
+``` python
+pip install lxml
+```
+or 
+```python
+conda install lxml
+```
+you can download and install it :-)

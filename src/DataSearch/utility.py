@@ -4,7 +4,6 @@ import time
 import requests
 import re
 import json
-from bs4 import BeautifulSoup
 
 from xml.dom.minidom import Document
 from json.decoder import JSONDecodeError
