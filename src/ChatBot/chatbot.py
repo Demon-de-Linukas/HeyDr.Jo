@@ -221,7 +221,7 @@ def get_input(message):
                     bot.send_message(chatid, 'These are the related objects. If you want to know more about one, '
                          'please enter the reference number!'
                          'Otherwise I can tell you more about the <b>artist</b>, <b>time</b> '
-                         'or <b>style</b> of your current object.''
+                         'or <b>style</b> of your current object.'
                                              , parse_mode='HTML')
                 elif sent == 0:
                     bot.send_message(chatid, 'Sorry, I can\'t help with this...\n\n But I can tell you more about: '
