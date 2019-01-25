@@ -35,13 +35,11 @@ chattingBot = ChatBot("Training Example",
                       logic_adapters=[
                           # {'import_path': 'chatterbot.logic.MathematicalEvaluation'
                           #  },
-                          # {'import_path': 'chatterbot.logic.BestMatch'
-                          #  },
                           {'import_path': 'chatterbot.logic.SpecificResponseAdapter',
                            'input_text': 'Who are you',
                            'output_text': 'I am Dr. Jo, a chat bot of Städel Museum :-)'},
                           {'import_path': 'chatterbot.logic.LowConfidenceAdapter',
-                            'threshold': 0.65,
+                            'threshold': 0.5,
                             'default_response': 'I am sorry, but I do not understand.'},
                           {
                             "import_path": "chatterbot.logic.BestMatch",
@@ -239,7 +237,7 @@ def get_input(message):
                 photo = open(pathOfPhoto + picname + '.jpg', 'rb')
                 #bot.send_message(chatid, u'Sending photo... Please wait')
                 bot.send_photo(chatid, photo, caption=artName)
-            except (FileNotFoundError):
+            except (FileNotFoundError,OSError):
                 print('no photo')
             write_user_cache(userid=userid,key='knowInfo',value='3')
             bot.send_message(chatid, '\n\n\nDo you want to see more work from this artist?',
