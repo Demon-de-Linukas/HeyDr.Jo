@@ -4,11 +4,40 @@ import time
 import requests
 import re
 import json
-from bs4 import BeautifulSoup
 
 from xml.dom.minidom import Document
 from json.decoder import JSONDecodeError
 
+
+def search_related(current,root):
+    relatedlist =[]
+    ref = current.replace('_', ' ')
+    refnumberlist = root.getiterator('object_number')
+    for refnumber in refnumberlist:
+        if refnumber.text.upper() == ref.upper():
+            record = refnumber.getparent()
+            if record.tag != 'record':
+                continue
+            break
+    assolist = record.getiterator('Association_object')
+    for asso in assolist:
+        try:
+            refn = asso.find('./association.object.object_number').find('./object_number')
+            if refn.text == current or refn.text in relatedlist:
+             continue
+            relatedlist.append(refn.text)
+        except (AttributeError, EOFError, IndexError) as e:
+            print(e)
+    rellist = record.getiterator('Related_object')
+    for rel in rellist:
+        try:
+            num = rel.find('./related_object_reference')
+            if refn.text == current or refn.text in relatedlist:
+                continue
+            relatedlist.append(num.text)
+        except (AttributeError, EOFError, IndexError) as e:
+            print(e)
+    return relatedlist
 
 def search_pic_of_artist(artiName,current,root):
     relatedlist =[]
@@ -23,10 +52,10 @@ def search_pic_of_artist(artiName,current,root):
             if len(relatedlist) >4:
                 return relatedlist
     return relatedlist
+
 def get_start_info(ref, root):
     """
     This method will search the title, name of artist and the created year from xml.
-
     Parameters
     ----------
     ref: :str
@@ -43,7 +72,6 @@ def get_start_info(ref, root):
 
     year ::str
     """
-
     record = None
     ref = ref.replace('_',' ')
     refnumberlist = root.getiterator('object_number')
