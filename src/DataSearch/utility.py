@@ -4,9 +4,41 @@ import time
 import requests
 import re
 import json
-
+import csv
+import datetime
 from xml.dom.minidom import Document
 from json.decoder import JSONDecodeError
+import os
+import logging
+
+logPath = 'userCache.csv'
+fieldnames = ['userID', 'knowInfo', 'artist', 'refnumber', 'style', 'period', 'chatting', 'search']
+commentPath = 'Comment-Database.xml'
+
+
+def initlog(logadress):
+    today = str(datetime.date.today())
+    try:
+        os.mkdir(logadress+today)
+    except (FileExistsError,FileNotFoundError) as e:
+        print(e)
+    # create logger with 'spam_application'
+    logger = logging.getLogger('chatBot')
+    logger.setLevel(logging.DEBUG)
+    # create file handler which logs even debug messages
+    fh = logging.FileHandler('%schatBot.log'%logadress)
+    fh.setLevel(logging.DEBUG)
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.ERROR)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+    # add the handlers to the logger
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    return logger
 
 
 def search_related(current,root):
@@ -39,6 +71,7 @@ def search_related(current,root):
             print(e)
     return relatedlist
 
+
 def search_pic_of_artist(artiName,current,root):
     relatedlist =[]
     creatorList=root.getiterator('Creator')
@@ -52,6 +85,7 @@ def search_pic_of_artist(artiName,current,root):
             if len(relatedlist) >4:
                 return relatedlist
     return relatedlist
+
 
 def get_start_info(ref, root):
     """
@@ -463,3 +497,91 @@ def search_img(namestr):
                     return f
 
 
+def get_user_cache(userid, key):
+    global logPath
+    with open(logPath, "rt", encoding='utf-8') as log:
+        reader = csv.DictReader(log)
+        for row in reader:
+            if row['userID'] == userid:
+                return row[key]
+
+
+def write_user_cache(userid, key, value):
+    global logPath,fieldnames
+    csvdict = csv.DictReader(open(logPath, 'rt', encoding='utf-8', newline=''))
+    dictrow = []
+    for row in csvdict:
+        if row['userID'] == userid:
+            row[key] = value
+        # rowcache.update(row)
+        dictrow.append(row)
+
+    with open(logPath, "w+", encoding='utf-8', newline='') as lloo:
+        # lloo.write(new_a_buf.getvalue())
+        wrier = csv.DictWriter(lloo, fieldnames)
+        wrier.writeheader()
+        for wowow in dictrow:
+            wrier.writerow(wowow)
+
+
+def init_comment():
+    global commentPath
+    doc = Document()  # create DOM object
+    record = doc.createElement('records')
+    doc.appendChild(record)
+    f = open(commentPath, 'w', encoding='utf-8')
+    doc.writexml(f, indent='\t', newl='\n', addindent='\t', encoding='utf-8')
+    f.close()
+
+
+def write_comment(userid,message):
+    global commentPath
+    ref = get_user_cache(userid, 'refnumber')
+    username = message.chat.first_name
+    comment = message.text
+    tree = etree.parse(commentPath)
+    root = tree.getroot()
+    rec = etree.Element('rec')
+    new_child(rec, comment, 'comment')
+    new_child(rec, ref, 'refNumber')
+    new_child(rec, username, 'userName')
+    root.append(rec)
+    tree.write(commentPath, encoding="utf-8",xml_declaration=True)
+
+    # posts = db.posts
+    #
+    # pars={'refNumber': ref,
+    #       'userName': username,
+    #       'comment': comment,
+    #       'like':like}
+    # posts.insert_one(pars).inserted_id
+
+
+def new_child(root,comment, key):
+    com = etree.Element(key)
+    com.text = comment
+    root.append(com)
+
+
+def read_comment(ref):
+    global commentPath
+    recordList = []
+    tree = etree.parse(commentPath)
+    root = tree.getroot()
+    refnumberlist = root.getiterator('refNumber')
+    for refnumber in refnumberlist:
+        if refnumber.text.upper() == ref.upper():
+            record = refnumber.getparent()
+            if record.tag != 'rec':
+                continue
+            else:
+                recordList.append(record)
+    return recordList
+
+
+    # posts = db.posts
+    # try:
+    #     comments = posts.find({'refNumber': refNumber})
+    #     return comments
+    # except pymongo.errors.CursorNotFound as e:
+    #     print(e)

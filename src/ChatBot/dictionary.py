@@ -6,6 +6,8 @@ dict['hello']=['hi', 'hello', 'hallo', 'good day','hi!', 'hello!', 'hallo!', 'go
 dict['thanks']=['thanks', 'thank you', 'i appreciate it', 'that\'s nice of you', 'thx']
 dict['bye']=['bye', 'goodbye', 'ciao', 'see ya', 'so long']
 dict['you are welcome']=['You are welcome.', 'My pleasure.']
+dict['see'] = ['read', 'see', 'show', 'know', 'learn', 'check']
+dict['write'] = ['write', 'edit', 'enter', 'leave', 'give']
 
 # messasge = 'ciao'
 # for dd in dict:

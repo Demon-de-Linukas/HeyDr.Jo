@@ -1,3 +1,2 @@
-userID,knowInfo,artist,refnumber,style,period,chatting
-714394428,2,"Schütz d. Ä., Christian Georg",18,Baroque,1765,False
-781549524,2,Oberrheinischer Meister um 1410/20,HM_54,Late Middle Ages,ca. 1410 - 1420,False
+userID,knowInfo,artist,refnumber,style,period,chatting,search
+781549524,2,"Thoma, Hans",2000,realism,1907,False,False
