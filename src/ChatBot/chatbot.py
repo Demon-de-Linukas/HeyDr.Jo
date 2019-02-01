@@ -145,20 +145,20 @@ def send_welcome(message):
 def send_welcome(message):
     userid = str(message.from_user.id)
     init(userid)
-    bot.send_message(message.chat.id, 'Welcome to Hey Dr.Jo chat bot!\nTo start visiting meseum please enter'
-                                  ' /visit\nTo chat with me please use command /chat.'
-                                  '\nTo restart the chat bot please use command /restart.')
+    bot.send_message(message.chat.id, 'Welcome to the chatbot Hey Dr.Jo!\nTo start the museum guide please enter'
+                                      ' /museum\n To just talk to me please enter /chat.'
+                                      '\nTo restart the chatbot please use /restart.')
 
 
 @bot.message_handler(commands=['visit'])
 def greating(message):
     userid = str(message.from_user.id)
-    bot.send_message(message.chat.id, "Dear customer, I am Dr. Jo!\n"
-                                      "Today I will be your museum guide and provide you some "
-                                      "professional and interesting information about our art objects!\n\n"
-                                      "Which object are you currently looking at or interested in?\n\n"
+    bot.send_message(message.chat.id, "Hey there, I am Dr. Jo!\n"
+                                      "Today I will be your museum guide and provide you with "
+                                      "interesting information about our art objects!\n\n"
+                                      "Which object are you currently looking at?\n\n"
 
-                                      "[<b>Ref. number</b> or <b>Title</b> of object]\n\n"
+                                      "[Type in the <b>Ref. number</b> or <b>Title</b> of any object]\n\n"
                                       "If you have any question, use command /search. "
                                       "Then you can search it in Wikipedia!", parse_mode='HTML')
     write_user_cache(userid, 'knowInfo', '1')
@@ -204,15 +204,14 @@ def get_input(message):
             response = chattingBot.get_response(statment)
             bot.send_message(chatid, response)
             return
-        elif message.text.lower() in __dict__['hello']:
-            greating(message)
-            return
-        elif get_user_cache(userid, 'chatting')=='True':
+        elif get_user_cache(userid, 'chatting') == 'True':
             statment = message.text
             response = chattingBot.get_response(statment)
             bot.send_message(chatid, response)
             return
-
+        elif message.text.lower() in __dict__['hello']:
+            greating(message)
+            return
         elif get_semantic(message.text.lower(), 'yes') and get_user_cache(userid, 'knowInfo') == '3':
             artist = get_user_cache(userid, 'artist')
             curent = get_user_cache(userid, 'refnumber')
