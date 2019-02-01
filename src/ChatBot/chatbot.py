@@ -220,8 +220,8 @@ def get_input(message):
             sent = 0
             if len(piclist)==0:
                 bot.send_message(chatid,
-                                 'Sorry, but i can\'t find any more in our Museum....\n\nWhat would you like to know, '
-                                 'the <b>related object</b>, <b>time</b> or <b>style</b>.'
+                                 'Sorry, I can\'t help with this...\n\n But I can tell you more about: '
+                                 'the <b>related objects</b>, <b>time</b> or <b>style</b>.'
                                  , parse_mode='HTML')
             else:
 
@@ -237,18 +237,18 @@ def get_input(message):
                         logger.error('---> %s' % str(e))
                         logger.warn('No photo')
                 if sent == 1:
-                    bot.send_message(chatid, 'Those are what I get. \n\nAre you intrested in any of them? '
-                                             'Please give the reference number!\n\n'
-                                             'Or I can also introduce you more about the'
-                                             ' <b>artist</b>, <b>time</b> or <b>style</b>.'
+                    bot.send_message(chatid, 'These are the related objects. If you want to know more about one, '
+                                             'please enter the reference number!\n'
+                                             'Otherwise I can tell you more about the <b>artist</b>, <b>time</b> '
+                                             'or <b>style</b> of your current object.'
                                              , parse_mode='HTML')
                 elif sent == 0:
-                    bot.send_message(chatid, 'Sorry, but i can\'t find any more in our Museum....'
-                                             '\n\nWhat would you like to know, '
-                                             'the <b>related object</b>, <b>time</b> or <b>style</b>.'
-                                             '\n\nYou also can check <b>Comments</b> from others'
-                                             ' or <b>write</b> a comment.'
-                                                 ,parse_mode='HTML')
+                    bot.send_message(chatid, ' Sorry, I can\'t help with this...\n\n But I can tell you more about: '
+                                             'the <b>artist</b>, <b>time</b>, '
+                                             '<b>style</b> or <b>related objects</b> of this object.'
+                                             '\n\nYou also can <b>check Comments</b> from others'
+                                             ' or <b>write a comment</b>.'
+                                             , parse_mode='HTML')
 
             write_user_cache(userid=userid,key='knowInfo',value='2')
             return
@@ -312,7 +312,7 @@ def get_input(message):
         elif "STYLE" in message.text.upper() and get_user_cache(userid, 'knowInfo') == '2':
             bot.send_message(chatid, ut.search_style_xml(get_user_cache(userid, 'style'), rootGene))
             write_user_cache(userid=userid,key='knowInfo',value='2')
-            bot.send_message(chatid, 'Do you want to know more Information?',
+            bot.send_message(chatid, 'Do you want more information?',
                              parse_mode='HTML')
             return
 
@@ -320,7 +320,7 @@ def get_input(message):
             chatid = message.chat.id
             bot.send_message(chatid, search_time(get_user_cache(userid, 'period')))
             write_user_cache(userid=userid,key='knowInfo',value='2')
-            bot.send_message(chatid, 'Do you want to know more Information?',
+            bot.send_message(chatid, 'Do you want more information?',
                              parse_mode='HTML')
             return
 
@@ -332,10 +332,10 @@ def get_input(message):
             sent = 0
             i = 0
             if len(piclist) == 0 and len(relalist) == 0:
-                bot.send_message(chatid,
-                                 'Sorry, but i can\'t find any more in our Museum....\n\nWhat would you like to know, '
-                                 'the <b>related object</b>, <b>time</b> or <b>style</b>.'
-                                 , parse_mode='HTML')
+                bot.send_message(chatid, 'Sorry, I can\'t help with this...\n\n But I can tell you more about: '
+                                         'the <b>artist</b>, <b>time</b>, '
+                                         '<b>style</b> or <b>related objects</b> of this object.'
+                                         , parse_mode='HTML')
             else:
 
                 for p in piclist:
@@ -366,33 +366,29 @@ def get_input(message):
                     if i > 4:
                         break
                 if sent == 0:
-                    bot.send_message(chatid,
-                                     'Sorry, but i can\'t find any more in our '
-                                     'Museum....\n\nWhat would you like to know, '
-                                     'the artist, time, '
-                                     'style or some related objects of this picture?')
+                    bot.send_message(chatid, 'Sorry, I can\'t help with this...\n\n But I can tell you more about: '
+                                             'the <b>artist</b>, <b>time</b>, '
+                                             '<b>style</b> or <b>related objects</b> of this object.', parse_mode='HTML')
                 else:
-                    bot.send_message(chatid, 'Those are what I get. \n\nAre you intrested in any of them? '
-                                             'Please give the reference number!\n\n'
-                                             'Or I can also introduce you more about'
-                                             ' the <b>artist</b>, <b>time</b> or <b>style</b>.'
-                                             '\n\nYou also can check <b>Comments</b> from others'
-                                             ' or <b>write</b> a comment.'
+                    bot.send_message(chatid, 'These are the related objects. If you want to know more about one, '
+                                             'please enter the reference number!\n'
+                                             'Otherwise I can tell you more about the <b>artist</b>, <b>time</b> '
+                                             'or <b>style</b> of your current object.'
+                                             '\n\nYou also can check <b>comments</b> from others'
+                                             ' or <b>write a comment</b>.'
                                              , parse_mode='HTML')
             write_user_cache(userid=userid,key='knowInfo',value='2')
             return
         elif (get_semantic(message.text.lower(), 'yes') and get_user_cache(userid, 'knowInfo') == '2') \
                 or (get_semantic(message.text.lower(), 'no') and get_user_cache(userid, 'knowInfo') == '3'):
-            bot.send_message(chatid, u'What would you like to know, '
-                                     'introductions about the artist, time, '
-                                     'style or some related objects of this object in our museum?'
+            bot.send_message(chatid, u'Tell me, about what exactly you would like to know more, so I don\'t bore you!'
                                      '\n\n[<b>artist,time,style</b> or <b>related object</b>] '
-                                     '\n\nYou also can check <b>Comments</b> from others'
-                                             ' or <b>write</b> a comment.', parse_mode='HTML')
-            write_user_cache(userid=userid, key='knowInfo',value='2')
+                                     '\n\nYou also can check <b>comments</b> from others'
+                                     ' or <b>write a comment</b>.', parse_mode='HTML')
+            write_user_cache(userid=userid, key='knowInfo', value='2')
             return
         elif get_semantic(message.text.lower(), 'no'):
-            bot.send_message(chatid, u'Please give the number or the name of your interested object!')
+            bot.send_message(chatid, u'Please enter the number or the name of your interested object!')
             write_user_cache(userid=userid,key='knowInfo',value='1')
             return
 
@@ -410,13 +406,13 @@ def get_input(message):
             title, artist, period, refnum, record = ut.get_start_info(message.text, root)
             detail_Info, listing = ut.get_details(record)
 
-            write_user_cache(userid,'knowInfo','0' )
-            write_user_cache(userid,'artist',artist )
-            write_user_cache(userid,'refnumber',refnum )
-            write_user_cache(userid,'style',listing['style'] )
-            write_user_cache(userid,'period',period )
-            write_user_cache(userid,'chatting','False' )
-            write_user_cache(userid,'search','False' )
+            write_user_cache(userid, 'knowInfo', '0' )
+            write_user_cache(userid, 'artist', artist)
+            write_user_cache(userid, 'refnumber', refnum)
+            write_user_cache(userid, 'style', listing['style'])
+            write_user_cache(userid, 'period', period)
+            write_user_cache(userid, 'chatting', 'False')
+            write_user_cache(userid, 'search', 'False')
 
             bot.reply_to(message, 'Title: \n%s\n\nCreator: \n%s\n\nCreated period: \n%s\n\n\n%s' % (
             title, artist, period, detail_Info))
@@ -434,19 +430,19 @@ def get_input(message):
             write_user_cache(userid=userid,key='knowInfo',value='2')
             return
         else:
-            bot.send_message(chatid,'Sorry I don\'t understand! '
-                                 'Please follow the instruction'
-                                    ' above or check the input!'
-                                 '\n\nTo restart the chat bot please use command '
-                                 '\'/restart\'.\nJust want to chat? Try command \'/chat\'!\n\n'
-                                 'If you have any question, use command /search. '
-                                 'Then you can search it in Wikipedia!')
+            bot.send_message(chatid, 'Sorry I don\'t understand! '
+                                     'Please follow the instruction'
+                                     ' above or check your input!'
+                                     '\n\nTo restart the chatbot please use command '
+                                     '\'/restart\'.\nJust want to chat? Try command \'/chat\'!\n\n'
+                                     'If you have any question, use command /search. '
+                                     'Then you can search it in Wikipedia!')
             return
     except (AttributeError, EOFError, IndexError) as e6:
         logger.error('---> %s' % str(e6))
         bot.send_message(chatid, 'Sorry I don\'t understand! '
-                                 'Please follow the instruction above or check the input!'
-                                 '\n\nTo restart the chat bot please use command '
+                                 'Please follow the instruction above or check your input!'
+                                 '\n\nTo restart the chatbot please use command '
                                  '\'/restart\'.\nJust want to chat? Try command \'/chat\'! \n\n'
                                  'If you have any question, use command /search. '
                                  'Then you can search it in Wikipedia!')
