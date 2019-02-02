@@ -108,13 +108,13 @@ def chatter_command(message):
         init_cache(userid)
     if message.text.upper() == '/ENDCHAT':
         write_user_cache(userid, 'chatting', 'False')
-        bot.reply_to(message, 'End chatting. See ya!')
+        bot.reply_to(message, 'We ended our chat :( See ya!')
         return
     write_user_cache(userid, 'chatting', 'True')
     write_user_cache(userid, 'knowInfo', '0')
 
     bot.reply_to(message,
-                 'Okay, now let\'s chat!\nTo end the chatting and go back to Städel Museum, use command \'/endChat\'!')
+                 'Okay, now let\'s chat!\nTo end the chat and go back to the Museum guide, use command \'/endChat\'!')
     return
 
 
@@ -387,7 +387,7 @@ def get_input(message):
             write_user_cache(userid=userid, key='knowInfo', value='2')
             return
         elif get_semantic(message.text.lower(), 'no'):
-            bot.send_message(chatid, u'Please enter the number or the name of your interested object!')
+            bot.send_message(chatid, u'Please type in the number or the name of your object of interest!')
             write_user_cache(userid=userid,key='knowInfo',value='1')
             return
 
@@ -424,7 +424,7 @@ def get_input(message):
                 logger.error('---> %s' % str(e5))
                 logger.warn('No photo')
             bot.send_message(chatid,
-                             u'Should I introduce more information about this object?',
+                             u'Would you like more information about this object?',
                              parse_mode='HTML')
             write_user_cache(userid=userid,key='knowInfo',value='2')
             return
