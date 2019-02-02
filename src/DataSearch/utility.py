@@ -64,7 +64,7 @@ def search_related(current,root):
     for rel in rellist:
         try:
             num = rel.find('./related_object_reference')
-            if refn.text == current or refn.text in relatedlist:
+            if num.text == current or num.text in relatedlist:
                 continue
             relatedlist.append(num.text)
         except (AttributeError, EOFError, IndexError) as e:

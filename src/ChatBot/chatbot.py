@@ -245,14 +245,14 @@ def get_input(message):
                     bot.send_message(chatid, ' Sorry, I can\'t help with this...\n\n But I can tell you more about: '
                                              'the <b>artist</b>, <b>time</b>, '
                                              '<b>style</b> or <b>related objects</b> of this object.'
-                                             '\n\nYou also can <b>check Comments</b> from others'
+                                             '\n\nYou also can <b>check comments</b> from others'
                                              ' or <b>write a comment</b>.'
                                              , parse_mode='HTML')
 
             write_user_cache(userid=userid,key='knowInfo',value='2')
             return
         elif ("COMMENT" in message.text.upper() and get_semantic(
-                message.text, 'write')) or(get_semantic(message.text, 'yes') and get_user_cache(userid, 'knowInfo') == 'rc'):
+                message.text, 'write')) or(get_semantic(message.text.lower(), 'yes') and get_user_cache(userid, 'knowInfo') == 'rc'):
             bot.send_message(chatid, 'Please text the comment now!')
             write_user_cache(userid=userid,key='knowInfo',value='wc')
             return
@@ -281,7 +281,7 @@ def get_input(message):
             write_user_cache(userid=userid,key='knowInfo',value='rc')
             return
 
-        elif get_semantic(message.text, 'no') and get_user_cache(userid, 'knowInfo') == 'rc':
+        elif get_semantic(message.text.lower(), 'no') and get_user_cache(userid, 'knowInfo') == 'rc':
             write_user_cache(userid=userid, key='knowInfo', value='2')
             bot.send_message(chatid, 'Fine. Do you want to know more Information?',
                              parse_mode='HTML')
@@ -386,7 +386,7 @@ def get_input(message):
                                      ' or <b>write a comment</b>.', parse_mode='HTML')
             write_user_cache(userid=userid, key='knowInfo', value='2')
             return
-        elif get_semantic(message.text.lower(), 'no'):
+        elif get_semantic(message.text.lower(), 'no') and get_user_cache(userid, 'knowInfo') != 'rc':
             bot.send_message(chatid, u'Please type in the number or the name of your object of interest!')
             write_user_cache(userid=userid,key='knowInfo',value='1')
             return
