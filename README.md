@@ -33,4 +33,5 @@ you can download and install it :-)
 The whole Data set is in [box.com](https://app.box.com/v/HeyDrJoDataset) available. All the pictures are compressed.
 If you need the uncompressed pictures, under link of [Coding Da Vinci](http://136.243.4.67/index.php/s/rAoXIMAqN5hAweh) is it available.
 
-
+### Patch
+Please follow the instruction in `src/patch/Readme.md` and install the patch!
