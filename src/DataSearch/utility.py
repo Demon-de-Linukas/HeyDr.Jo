@@ -154,7 +154,6 @@ def get_start_info(ref, root):
     return titlestr, namestr, time, refnumber, record
 
 
-
 def get_details(record):
     dict = {}
     title = record.find('.//Title')

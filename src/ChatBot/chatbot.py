@@ -224,14 +224,14 @@ def get_input(messages):
 
         try:
             chatid = message.chat.id
-            if 'time' in message.text.lower():
+            if 'time' in message.text.lower() or 'hour' in message.text.lower():
                 if 'open' in message.text.lower() or 'close' in message.text.lower():
                     bot.send_message(chatid, 'The opening hours of <i>Städel Museum</i> are:\n\n'
                                              'Tues. Wed. Sat. Sun. :\nfrom <b>10:00</b> to'
                                              ' <b>18:00</b>\n\n'
                                              'Thurs. Fri. :\nfrom <b>10:00</b> to'
                                              ' <b>21:00</b>\n\n'
-                                             'Mon. :\n <b>Closed</b>', parse_mode='HTML')
+                                             'Mon. :\n<b>Closed</b>', parse_mode='HTML')
                     return
             if get_user_cache(userid, 'knowInfo') not in ['1','wc', 'rc']:
                 if is_process(message.text):
@@ -314,7 +314,7 @@ def get_input(messages):
                 comments = ut.read_comment(ref)
                 if len(comments) == 0:
                     bot.send_message(chatid, 'Sorry, there are no comments for this object!\n\n'
-                                             'Do you want to write a comment? <b>yes</b> or <b>no</b>')
+                                             'Do you want to write a comment? <b>yes</b> or <b>no</b>', parse_mode='HTML')
                     write_user_cache(userid=userid, key='knowInfo', value='rc')
                     return
                 count = 0
@@ -324,12 +324,11 @@ def get_input(messages):
                     comm = random.choice(comments)
                     comments.remove(comm)
                     bot.send_message(chatid, '[%s]. Comment from <b>[%s]</b>:\n\"%s\"\n\n'%(str(i+1), comm.find('userName').text,
-                                                                          comm.find('comment').text),
-                                     parse_mode='HTML')
+                                                                          comm.find('comment').text),parse_mode='HTML')
                     count += 1
                     if count >= 3:
                         break
-                bot.send_message(chatid, 'Do you want to write a comment? <b>yes</b> or <b>no</b>')
+                bot.send_message(chatid, 'Do you want to write a comment? <b>yes</b> or <b>no</b>',parse_mode='HTML')
                 write_user_cache(userid=userid,key='knowInfo',value='rc')
                 return
 
