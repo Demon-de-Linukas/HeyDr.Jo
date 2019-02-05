@@ -147,7 +147,7 @@ def send_welcome(message):
 
 
 @bot.message_handler(commands=['server'])
-def send_welcome(message):
+def send_server(message):
     userid = str(message.from_user.id)
     bot.send_message(message.chat.id, 'Step:%s\nArtist:%s\nStyle:%s' % (get_user_cache(userid, 'knowInfo'),
                                                                         get_user_cache(userid, 'artist'),
@@ -156,7 +156,7 @@ def send_welcome(message):
 
 
 @bot.message_handler(commands=['search'])
-def send_welcome(message):
+def search(message):
     userid = str(message.from_user.id)
     write_user_cache(userid, 'search', 'True')
     bot.send_message(message.chat.id, 'What do you want to search? Please tell me the key word!')
@@ -164,7 +164,7 @@ def send_welcome(message):
 
 
 @bot.message_handler(commands=['start', 'help', 'restart', 'Start', 'Restart'])
-def send_welcome(message):
+def sartInfo(message):
     userid = str(message.from_user.id)
     init(userid)
     bot.send_message(message.chat.id, 'Learning never exhausts the mind!\n'
@@ -225,7 +225,16 @@ def get_input(messages):
 
         try:
             chatid = message.chat.id
-            if get_user_cache(userid, 'knowInfo') not in ['wc', 'rc']:
+            if 'time' in message.text.lower():
+                if 'open' in message.text.lower() or 'close' in message.text.lower():
+                    bot.send_message(chatid, 'The open time of the <i>Städel Museum</i> is:\n\n'
+                                             'Tues. Wed. Sat. Sun. :\nfrom <b>10:00</b> to'
+                                             ' <b>18:00</b>\n\n'
+                                             'Thurs. Fri. :\nfrom <b>10:00</b> to'
+                                             ' <b>21:00</b>\n\n'
+                                             'Mon. :\n <b>Closed</b>', parse_mode='HTML')
+                    return
+            if get_user_cache(userid, 'knowInfo') not in ['1','wc', 'rc']:
                 if is_process(message.text):
                     if get_user_cache(userid, 'chatting') != 'True':
                         write_user_cache(userid, 'chatting', 'False')
@@ -434,7 +443,8 @@ def get_input(messages):
                 return
             elif (get_semantic(message.text.lower(), 'yes') and get_user_cache(userid, 'knowInfo') == '2') \
                     or (get_semantic(message.text.lower(), 'no') and get_user_cache(userid, 'knowInfo') == '3'):
-                bot.send_message(chatid, u'Tell me, about what exactly you would like to know more, so I don\'t bore you!'
+                bot.send_message(chatid, u'Tell me, about what exactly you would like to know more, '
+                                         u'so I don\'t bore you!'
                                          '\n\n[<b>artist,time,style</b> or <b>related object</b>] '
                                          '\n\nYou also can check <b>comments</b> from others'
                                          ' or <b>write a comment</b>.', parse_mode='HTML')
