@@ -14,9 +14,9 @@ pathOfDataset = 'D:\Workspace\Staedel/Objekte.xml'
 #pathOfDataset = 'generatedDataSet.xml'
 tree = etree.parse(pathOfDataset)
 root = tree.getroot()
-list = ut.search_pic_of_artist('Schütz d. Ä., Christian Georg','18',root)
-for ll in list:
-    print(ll)
+# list = ut.search_pic_of_artist('Schütz d. Ä., Christian Georg','18',root)
+# for ll in list:
+#     print(ll)
 # artistList = root.getiterator('Artist')
 # for artist in artistList:
 #     try:
@@ -27,11 +27,11 @@ for ll in list:
 
 #
 
-# # listing = ut.getAllArtist(root)
-# # ut.create_artist_datenSet(listing,'C:/Users\linuk\Desktop/listAll.xml')
-# # lstSum = ut.getAllStyle(root)
-# # ut.create_style_tree(lstSum,'C:/Users\linuk\Desktop/listAll.xml','C:/Users\linuk\Desktop\lisss.xml')
-#
+listing = ut.getAllArtist(root)
+ut.create_artist_datenSet(listing, 'C:/Users\linuk\Desktop/listAll.xml')
+lstSum = ut.getAllStyle(root)
+ut.create_style_tree(lstSum, 'C:/Users\linuk\Desktop/listAll.xml','C:/Users\linuk\Desktop\lisss.xml')
+
 # while True:
 #     num = input('Please give the number of the painting:\n')
 #     try:

@@ -26,7 +26,7 @@ def initlog(logadress):
     logger = logging.getLogger('chatBot')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
-    fh = logging.FileHandler('%schatBot.log'%logadress)
+    fh = logging.FileHandler('%s/chatBot.log'%(logadress+today))
     fh.setLevel(logging.DEBUG)
     # create console handler with a higher log level
     ch = logging.StreamHandler()
@@ -56,17 +56,19 @@ def search_related(current,root):
         try:
             refn = asso.find('./association.object.object_number').find('./object_number')
             if refn.text == current or refn.text in relatedlist:
-             continue
-            relatedlist.append(refn.text)
+               continue
+            if refn.text is not None:
+                relatedlist.append(refn.text)
         except (AttributeError, EOFError, IndexError) as e:
             print(e)
     rellist = record.getiterator('Related_object')
     for rel in rellist:
         try:
             num = rel.find('./related_object_reference')
-            if refn.text == current or refn.text in relatedlist:
+            if num.text == current or num.text in relatedlist:
                 continue
-            relatedlist.append(num.text)
+            if num.text is not None:
+                relatedlist.append(num.text)
         except (AttributeError, EOFError, IndexError) as e:
             print(e)
     return relatedlist
@@ -81,7 +83,8 @@ def search_pic_of_artist(artiName,current,root):
             number = recordcache.find('./object_number')
             if number.text == current:
                 continue
-            relatedlist.append(number.text)
+            if number.text is not None:
+                relatedlist.append(number.text)
             if len(relatedlist) >4:
                 return relatedlist
     return relatedlist
@@ -151,7 +154,6 @@ def get_start_info(ref, root):
     return titlestr, namestr, time, refnumber, record
 
 
-
 def get_details(record):
     dict = {}
     title = record.find('.//Title')
@@ -197,17 +199,20 @@ def get_details(record):
     return detail_Info,dict
 
 
-def name_API(str):
+def name_API(nameString):
     """
     Covert name string to an acceptable format for API
-    :param str:
+    :param nameString:
     :return:
     """
-    s1 = str.replace('d. Ä.', 'der Ältere')
+    if 'd. Ä.'in nameString:
+        sasd = nameString.replace('d. Ä.', 'the_Elder')
+    s1 = nameString.replace('d. Ä.', 'the_Elder')
     s2 = s1.replace('d. J.', 'der Jüngere')
-    s3 = s2.replace('d. V.', 'der Vetter')
-    s4 = s3.replace(' ', '_')
-    s5 = s4.replace('-', '_')
+    s3 = s2.replace('d. V.', 'the_Father')
+    #s3 = sa.replace('.', '')
+    # s4 = s3.replace(' ', '_')
+    # s5 = s4.replace('-', '_')
     try:
         nPos = s3.index(',')
         s4 = s3.replace(' ', '_')
@@ -239,6 +244,11 @@ def search_wiki(namestr):
         data = requests.get(jadd).json()
         artist = data[add]
         # TODO: Language change?
+        if 'http://dbpedia.org/ontology/wikiPageRedirects' in artist:
+            APIname = artist['http://dbpedia.org/ontology/wikiPageRedirects'][0]['value'][28:]
+            fi = search_wiki(APIname)
+            return fi
+
         descriptionList = artist['http://dbpedia.org/ontology/abstract']
         for description in descriptionList:
             if description['lang'] == 'en':
@@ -248,11 +258,12 @@ def search_wiki(namestr):
             if description['lang'] == 'de':
                 final = 'German description: '+description['value']
                 return final
-    except (KeyError,JSONDecodeError):
-        print('None english description!')
+    except (KeyError,JSONDecodeError) as e:
+        print(e)
     try:
-        add = 'https://en.wikipedia.org/w/api.php?action=query&titles= %s &prop=extracts&exintro&format=json&formatversion=2' % (
-            APIname)
+        add = 'https://en.wikipedia.org/w/api.php?action=query&titles= ' \
+              '%s &prop=extracts&exintro&format=json&formatversion=2' % (
+                APIname)
         datas = requests.get(add).json()
         querry = datas['query']
         page = querry['pages'][0]
@@ -264,8 +275,10 @@ def search_wiki(namestr):
     except KeyError:
         print('None english description!')
     try:
-        add = 'https://de.wikipedia.org/w/api.php?action=query&titles= %s &prop=extracts&exintro&format=json&formatversion=2' % (
-            APIname)
+        aName = APIname.replace('the_Elder', 'der_Ältere')
+        add = 'https://de.wikipedia.org/w/api.php?action=query&titles= ' \
+              '%s &prop=extracts&exintro&format=json&formatversion=2' % (
+            aName)
         datas = requests.get(add).json()
         querry = datas['query']
         page = querry['pages'][0]
@@ -332,6 +345,16 @@ def search_style_xml(name,root):
 
 
 def create_artist_datenSet(listSum, fpath):
+    '''
+    Exampel:
+        listing = ut.getAllArtist(root)
+        ut.create_artist_datenSet(listing, 'C:/Users\linuk\Desktop/listAll.xml')
+        lstSum = ut.getAllStyle(root)
+        ut.create_style_tree(lstSum, 'C:/Users\linuk\Desktop/listAll.xml','C:/Users\linuk\Desktop\lisss.xml')
+    :param listSum:
+    :param fpath:
+    :return:
+    '''
     doc = Document()  # create DOM object
     records = doc.createElement('records')
     AllPerson = doc.createElement('AllPerson')  # create root element
@@ -367,6 +390,8 @@ def getAllArtist(root):
         listName.append(namestr)
         description = search_wiki(namestr)
         listDescrip.append(description)
+        if i == 63:
+            print('Here!')
         print('%d\n'%(i))
         print('Time: %.3f '%(time.time()-pre))
         i +=1
