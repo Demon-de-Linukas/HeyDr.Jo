@@ -1,5 +1,5 @@
-# HeyDr.Jo
-The understand art chatbot
+# LeoBot
+The experience art bot
 
 In DataSearch are the utilities of the searching, analyzing and connecting method.
 
