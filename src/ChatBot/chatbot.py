@@ -19,7 +19,7 @@ from DataSearch.utility import get_user_cache
 import csv
 
 
-token = '730406855:AAGBHg4Vokf8N4tJoqhUOZG7Xf8y41uo7Ww'
+token = '730406855:AAFwE9UBF6qLVjTjFPQIZ2CsYgKMyWpFQSw'
 pathOfPhoto = 'D:\Workspace\Staedel\Abbildung/'
 pathOfDataset = 'D:\Workspace\Staedel/Objekte.xml'
 pathOfGene = 'generatedDataSet.xml'
@@ -263,7 +263,7 @@ def get_input(messages):
             elif get_semantic(message.text.lower(), 'yes') and get_user_cache(userid, 'knowInfo') == '3':
                 artist = get_user_cache(userid, 'artist')
                 curent = get_user_cache(userid, 'refnumber')
-                piclist = ut.search_pic_of_artist(artist,curent,root)
+                piclist = ut.search_other_works_of_artist(artist, curent, root)
                 sent = 0
                 if len(piclist) == 0:
                     bot.send_message(chatid,
@@ -378,7 +378,7 @@ def get_input(messages):
                 curent = get_user_cache(userid, 'refnumber')
                 relalist = ut.search_related(curent,root)
                 artist = get_user_cache(userid, 'artist')
-                piclist = ut.search_pic_of_artist(artist, curent, root)
+                piclist = ut.search_other_works_of_artist(artist, curent, root)
                 for plp in piclist:
                     if plp in relalist:
                         piclist.remove(plp)
@@ -519,7 +519,7 @@ def init_cache(userid):
     global logPath
     with open(logPath, "a+", encoding='utf-8') as log:
         writer = csv.writer(log)
-        writer.writerow([userid, '0', '', '', '', 'False'])
+        writer.writerow([userid, '0', '', '', '', 'False', 'False'])
 
 
 with open(logPath, 'w', newline='',encoding='utf-8') as csvfile:

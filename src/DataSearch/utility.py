@@ -17,6 +17,19 @@ commentPath = 'Comment-Database.xml'
 
 
 def initlog(logadress):
+    """
+    Initat logger file
+    Parameters
+    ----------
+    logadress: str
+        Adress of logger file
+
+    Returns
+    -------
+    logger: :class: '.Logger'
+        Initiated logger
+
+    """
     today = str(datetime.date.today())
     try:
         os.mkdir(logadress+today)
@@ -41,9 +54,23 @@ def initlog(logadress):
     return logger
 
 
-def search_related(current,root):
+def search_related(refNum, root):
+    """
+    Search the related objects in dataset
+    Parameters
+    ----------
+    refNum: str
+        Searched reference number
+    Root: root
+        root of xml tree which generated with dataset
+
+    Returns
+    ------------
+    relatedlist: list
+       A list of  related objects
+    """
     relatedlist =[]
-    ref = current.replace('_', ' ')
+    ref = refNum.replace('_', ' ')
     refnumberlist = root.getiterator('object_number')
     for refnumber in refnumberlist:
         if refnumber.text.upper() == ref.upper():
@@ -55,7 +82,7 @@ def search_related(current,root):
     for asso in assolist:
         try:
             refn = asso.find('./association.object.object_number').find('./object_number')
-            if refn.text == current or refn.text in relatedlist:
+            if refn.text == refNum or refn.text in relatedlist:
                continue
             if refn.text is not None:
                 relatedlist.append(refn.text)
@@ -65,7 +92,7 @@ def search_related(current,root):
     for rel in rellist:
         try:
             num = rel.find('./related_object_reference')
-            if num.text == current or num.text in relatedlist:
+            if num.text == refNum or num.text in relatedlist:
                 continue
             if num.text is not None:
                 relatedlist.append(num.text)
@@ -74,7 +101,24 @@ def search_related(current,root):
     return relatedlist
 
 
-def search_pic_of_artist(artiName,current,root):
+def search_other_works_of_artist(artiName, current, root):
+    """
+    search other works of an artist in dataset
+    Parameters
+    ----------
+    artiName: str
+        Name of artist
+    current: str
+        Current refnumber
+    root:
+        root of xml tree
+
+    Returns
+    -------
+    relatedlist: list
+       A list of  related objects
+
+    """
     relatedlist =[]
     creatorList=root.getiterator('Creator')
     for creator in creatorList:
@@ -95,19 +139,19 @@ def get_start_info(ref, root):
     This method will search the title, name of artist and the created year from xml.
     Parameters
     ----------
-    ref: :str
+    ref: str
         Reference number or title of the object
 
-    root: :str
+    root: str
         root of xml
 
     Returns
     -------
-    tittle ::str
+    tittle :str
 
-    name ::str
+    name :str
 
-    year ::str
+    year :str
     """
     record = None
     ref = ref.replace('_',' ')
@@ -155,6 +199,20 @@ def get_start_info(ref, root):
 
 
 def get_details(record):
+    """
+    Search the details information in the datasets
+    Parameters
+    ----------
+    record:
+        Tree knot of current visiting object
+    Returns
+    ------------
+    detail_Info: str
+       A paragraph of detail information
+
+    dict: dict
+        A dictionary contains searched data
+    """
     dict = {}
     title = record.find('.//Title')
     tt = title.find('.//title')
@@ -375,6 +433,16 @@ def create_artist_datenSet(listSum, fpath):
 
 
 def getAllArtist(root):
+    '''
+    Exampel:
+        listing = ut.getAllArtist(root)
+        ut.create_artist_datenSet(listing, 'C:/Users\linuk\Desktop/listAll.xml')
+        lstSum = ut.getAllStyle(root)
+        ut.create_style_tree(lstSum, 'C:/Users\linuk\Desktop/listAll.xml','C:/Users\linuk\Desktop\lisss.xml')
+    :param listSum:
+    :param fpath:
+    :return:
+    '''
     listName = []
     listDescrip = []
     sumList = []
@@ -402,6 +470,12 @@ def getAllArtist(root):
 
 
 def get_text_value(record,tagname):
+    '''
+    get the englisch descriptions
+    :param record:
+    :param tagname:
+    :return:
+    '''
     try:
         style = record.find(tagname)
         termList = style.getiterator('term')
@@ -573,14 +647,6 @@ def write_comment(userid,message):
     root.append(rec)
     tree.write(commentPath, encoding="utf-8",xml_declaration=True)
 
-    # posts = db.posts
-    #
-    # pars={'refNumber': ref,
-    #       'userName': username,
-    #       'comment': comment,
-    #       'like':like}
-    # posts.insert_one(pars).inserted_id
-
 
 def new_child(root,comment, key):
     com = etree.Element(key)
@@ -603,10 +669,3 @@ def read_comment(ref):
                 recordList.append(record)
     return recordList
 
-
-    # posts = db.posts
-    # try:
-    #     comments = posts.find({'refNumber': refNumber})
-    #     return comments
-    # except pymongo.errors.CursorNotFound as e:
-    #     print(e)
